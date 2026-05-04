@@ -1,0 +1,118 @@
+<br>
+<div class="row" [hidden]="false">
+  <div class="col-12" style="text-align: right">
+    <button style="display: inline-block;" type="button" class="btn btn-icon btn-tn btn-primary" title="Refresh" (click)="refreshTabla()" [disabled]="false"> <i class="fa fa-refresh icon-refresh"></i>
+    </button>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-xl-5 col-lg-6 col-md-6 col-sm-9" style="display:block; margin:auto">
+    <nb-card>
+      <nb-card-header>
+        <div class="row">
+          <div class="col-12">
+            <select id="input-marca" class="form-control"
+              name="marca" [(ngModel)]="marca_id" (change)="changeMarca($event.target.value)">
+              <option *ngFor="let marca of listado" [value]="marca.id">{{marca.nombre}}</option>
+            </select>
+          </div>
+        </div>
+      </nb-card-header>
+      <nb-card-body>
+        <div *ngIf="imgPostBase64" id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img class="d-block w-100" src="{{imgPostBase64}}" alt="Slide">
+            </div>
+          </div>
+          <a class="carousel-control-prev" role="button" data-slide="prev" ngClass="{'carousel-control-prev':true}" (click)="imagenAnterior()" >
+            <!-- <span class="carousel-control-prev-icon" aria-hidden="true"
+              style="width: 35px;height: 35px;"></span>
+            <span class="sr-only">Previous</span> -->
+            <span>
+              <i style="font-size: 40px; 
+                color: grey;" 
+                class="fa fa-chevron-left" aria-hidden="true"></i>
+            </span>
+          </a>
+          <a class="carousel-control-next" role="button" data-slide="next" ngClass="{'carousel-control-next':true}" (click)="imagenSiguiente()">
+            <!-- <span class="carousel-control-next-icon" aria-hidden="true"
+              style="width: 35px;height: 35px;"></span>
+            <span class="sr-only">Next</span> -->
+            <span>
+              <i style="font-size: 40px; 
+                color: grey;"
+                class="fa fa-chevron-right" aria-hidden="true"></i>
+            </span>
+          </a>
+        </div>
+      </nb-card-body>
+      <nb-card-footer>
+        <div class="text-right">
+          <button type="button" class="btn btn-tn btn-primary" (click)="open(modalEliminar)" [disabled]="selectImgIndex === null">
+            Eliminar
+          </button>
+          <button type="button" class="btn btn-tn btn-primary" (click)="open(modalNuevo);clearImage()">
+            Nuevo
+          </button>
+        </div>
+      </nb-card-footer>
+    </nb-card>
+  </div>
+</div>
+
+<ng-template #modalEliminar id="modalEliminar" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Eliminar imagen: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <p>
+      <strong>¿Realmente desea eliminar esta imagen?</strong>
+    </p>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-danger" (click)="c('Close click');eliminarMarco()">Aceptar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalNuevo let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Nuevo: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <div class="row">
+      <div class="col-12">
+        <label for="imagen">Imagen (JPG)</label>
+        <input type="file" name="imagen" id="imagen" (change)="capturarFile($event)" #fileInput accept="image/jpeg">
+      </div>        
+      <br><br>
+      <div class="col-12">
+        <img *ngIf="previsualizacion" src="{{previsualizacion}}" alt="" width="200" height="200">
+      </div>
+    </div>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="c('Close click');subirArchivo()">Aceptar</button>
+  </div>
+</ng-template>
+
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

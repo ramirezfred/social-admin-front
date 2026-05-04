@@ -1,0 +1,759 @@
+<div *ngIf="flag_vista == 1">
+  <br>
+  <div class="row">
+    <div class="col-12" style="text-align: right">
+      <button style="display: inline-block;" type="button" class="btn btn-icon btn-tn btn-primary" 
+        title="Refresh" (click)="  refreshTabla()"> 
+          <i class="fa fa-refresh icon-refresh"></i>
+      </button>
+    </div>
+  </div>
+
+  <br>
+  <div class="row">
+    <div class="col">    
+      <div style="text-align: right;">
+        <button style="display: inline-block;" class="btn btn-icon btn-tn btn-primary" 
+          title="Cotizar" (click)="aCrear()">
+            Cotizar
+        </button>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="container-fluid">
+      <div class="row">
+          <div class="col-12">    
+              <div class="input-group">
+                  <input placeholder="Buscar..." class="form-control" type="text" id="inputQuote" [(ngModel)]="inputTermino" (ngModelChange)="FilterByTermino()"/> 
+              </div>
+          </div>
+      </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-12"> 
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+            <th >Orden</th>
+            <th >Fecha</th>
+            <th >Hora</th>
+            <th >Cliente</th>
+            <th >Teléfono</th>
+            <th >Cant. Pzs.</th>
+            <th >Total</th>
+            <th >WhatsApp</th>
+            <th >Pago</th>
+            <th >Orden</th>
+            <th></th>
+            </tr>
+          </thead>  
+          <tbody>
+            <tr *ngFor="let item of items" >
+                
+                <td >{{item.folio}}</td>
+                <td >{{item.created_at | date:'dd/MM/yyyy'}}</td>
+                <td >{{item.created_at | date:'hh:mm:ss'}}</td>
+                <td >{{item.cliente}}</td>
+                <td >{{item.telefono}}</td>
+                <td >{{item.nro_productos | number: '1.0-0'}}</td>
+                <td >{{item.total | number: '1.2-2'}} {{item.moneda}}</td>
+                <td >
+
+                  <button style="margin-top: 4px;" type="button" class="btn btn-icon btn-tn btn-whatsapp-green" title="WhatsApp de seguimiento" (click)="sendWhatsapp1(item)">
+                    <i class="fa fa-whatsapp"></i>
+                  </button>
+
+                </td>
+                <td>
+                  
+                  <!-- Badge de estado -->
+                  <span [ngClass]="{
+                    'badge-pendiente':  item.pago_estado === 'pendiente',
+                    'badge-adelantado': item.pago_estado === 'adelantado',
+                    'badge-pagado':     item.pago_estado === 'pagado'
+                  }" style="font-size: 11px;">
+                    {{ item.pago_estado | uppercase }}
+                  </span>
+
+                  <!-- Resumen montos -->
+                  <small *ngIf="item.pago_estado === 'adelantado'" style="display:block; margin-top:4px;">
+                    <span>
+                      ↑ {{ item.total_pagado | currency: item.moneda }}
+                    </span>
+                    <span style="color:#f0ad4e;">
+                      · resta {{ item.saldo_restante | currency: item.moneda }}
+                    </span>
+                  </small>
+
+                  <!-- Botones -->
+                  <div style="margin-top:6px; display:flex; gap:4px;">
+                    <!-- Ver detalle (siempre visible si hay algún pago) -->
+                    <button type="button"
+                      class="btn btn-info btn-icon btn-tn"
+                      *ngIf="item.pago_estado !== 'pendiente'"
+                      (click)="abrirModalDetalle(item)"
+                      title="Ver detalle de pagos">
+                      <i class="fa fa-eye"></i>
+                    </button>
+
+                    <!-- Registrar pago (solo si no está pagado) -->
+                    <button type="button"
+                      class="btn btn-info btn-icon btn-tn"
+                      *ngIf="item.pago_estado !== 'pagado'"
+                      (click)="abrirModalPago(item)"
+                      title="Registrar pago">
+                      <i class="fa fa-credit-card"></i>
+                    </button>
+                  </div>
+
+                </td>
+                <td >
+                  <button 
+                    style="margin-top: 4px;" 
+                    type="button" 
+                    class="btn btn-primary btn-icon btn-tn" 
+                    title="PDF" 
+                    (click)="descargarComprobante(item)">
+                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                  </button>
+                </td>
+                <td >
+                  <button 
+                    style="margin-top: 4px;" 
+                    type="button" 
+                    class="btn btn-tn btn-primary" 
+                    title="Editar" 
+                    (click)="aEditar(item, i)">
+                    Editar
+                  </button>
+
+                  <!-- Botón tipo entrega -->
+                  <button
+                    style="margin-top: 4px;" 
+                    type="button" 
+                    class="btn btn-tn" 
+                    (click)="abrirModalTipoEntrega(item)"
+                    title="Tipo de entrega"
+                    [style.background]="item.tipo_entrega ? '#28a745' : '#555'">
+                    {{ item.tipo_entrega ? (item.tipo_entrega | titlecase) : 'Entrega' }}
+                  </button>
+
+                  <!-- Botón cancelar (oculto si pago_estado es pagado) -->
+                  <button
+                    type="button" 
+                    class="btn btn-tn" 
+                    *ngIf="item.pago_estado !== 'pagado'"
+                    (click)="abrirModalCancelar(item)"
+                    title="Cancelar cotización"
+                    style="background:#dc3545; color:#fff; margin-top: 4px;">
+                    Cancelar
+                  </button>
+
+                  <!-- Botón finalizar -->
+                  <button
+                    type="button" 
+                    class="btn btn-tn" 
+                    *ngIf="item.pago_estado === 'pagado'"
+                    (click)="abrirModalFinalizar(item)"
+                    title="Finalizar cotización"
+                    style="background:#007bff; color:#fff; margin-top: 4px;">
+                    Finalizar
+                  </button>
+
+                </td>
+
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="row">
+      <div class="col-12"> 
+      <div class="btn-toolbar" role="toolbar" style="margin: 0;">
+          <div class="btn-group">
+          <label style="margin-top:10px">Página {{currentIndex}}/{{pageNumber}} </label>
+          </div>
+          <div class="btn-group pull-right">
+          <ul class="pagination" >
+              <li class="page-item" [ngClass]="{'disabled': (currentIndex == 1 || pageNumber == 0)}" ><a class="page-link"  (click)="prevPage()" >Atrás</a></li>
+              <li class="page-item" *ngFor="let page of pagesIndex"  [ngClass]="{'active': (currentIndex == page)}">
+                  <a class="page-link" (click)="setPage(page)"  >{{page}} </a>
+              </li>
+              <li class="page-item" [ngClass]="{'disabled': (currentIndex == pageNumber || pageNumber == 0)}" ><a class="page-link"   (click)="nextPage()" >Siguiente</a></li>
+          </ul>
+          </div>
+      </div> 
+      </div>
+  </div>
+</div>
+
+<div *ngIf="flag_vista == 2">
+  <br>
+  <div class="row">
+    <div class="col">    
+      <div style="text-align: right;">
+        <button style="display: inline-block;" class="btn btn-icon btn-tn btn-info" 
+          title="Atrás" (click)="atras()">
+            Atrás
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <form autocomplete="off" [formGroup]="myForm">
+
+    <div class="row">
+        <div class="col-md-4 col-sm-12">
+            <div class="form-group">
+                <label class="form-control-label" for="moneda">Moneda</label>
+                <select class="form-control" id="moneda" formControlName="moneda" [class.is-invalid]="monedaNoValido">
+                    <option value="">Selecciona una moneda</option>
+                    <option [value]="'MXN'">MXN</option> 
+                    <option [value]="'USD'">USD</option>
+                </select>
+                <small *ngIf="monedaNoValido" class="text-danger">
+                    Campo requerido
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 col-sm-12">
+            <div class="form-group">
+                <label class="form-control-label" for="input-cliente">Cliente</label>
+                <input type="text" id="input-cliente" class="form-control" placeholder="Ej: Carlos García" formControlName="cliente" [class.is-invalid]="clienteNoValido">
+                <small *ngIf="clienteNoValido" class="text-danger">
+                    Campo requerido
+                </small>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-12">
+            <div class="form-group">
+                <label class="form-control-label" for="input-telefono">Teléfono</label>
+                <input type="text" id="input-telefono" class="form-control" placeholder="Teléfono" formControlName="telefono" [class.is-invalid]="telefonoNoValido">
+                <small *ngIf="telefonoNoValido" class="text-danger">
+                    Campo requerido
+                </small>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-12">
+            <div class="form-group">
+                <label class="form-control-label" for="input-email">Email</label>
+                <input type="text" id="input-email" class="form-control" placeholder="Email" formControlName="email" [class.is-invalid]="emailNoValido">
+                <small *ngIf="emailNoValido" class="text-danger">
+                    Campo inválido
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top: 15px;">
+        <div class="col-12"> 
+          <button class="btn btn-tn btn-info" 
+            title="Nuevo concepto" (click)="newConcepto()">
+            Nuevo concepto 
+        </button>
+        </div>
+    </div>
+
+    <form autocomplete="off" [formGroup]="myFormConcepto" [hidden]="!flag_new_concepto" style="margin-top: 15px;">
+      <div class="row">
+        <div class="col-md-4 col-sm-12">
+            <!-- <div class="form-group">
+                <label class="form-control-label" for="input-supplier_id">Proveedor</label>
+                <select class="form-control" id="supplier_id" formControlName="supplier_id" [class.is-invalid]="supplier_idNoValido">
+                    <option value="">Selecciona un proveedor</option>
+                    <option *ngFor="let supplier of suppliers" [value]="supplier.id">{{ supplier.razon_social }}</option> 
+                </select>
+                <small *ngIf="supplier_idNoValido" class="text-danger">
+                    Campo requerido
+                </small>
+            </div> -->
+
+            <div class="row">
+              <div class="col-12">
+                <div class="form-group">
+                  <label class="form-control-label" for="input-supplier_razon_social">Proveedor</label>
+                  <input type="text" 
+                    id="input-supplier_razon_social" 
+                    class="form-control" 
+                    placeholder="Proveedor" 
+                    formControlName="supplier_razon_social" 
+                    [class.is-invalid]="supplier_razon_socialNoValido"
+                    (focus)="mostrarAutocompletado()"
+                    (blur)="ocultarAutocompletado()"
+                    (click)="inputSupplier.select()"
+                    #inputSupplier>
+                  <small *ngIf="supplier_razon_socialNoValido" class="text-danger">
+                      Campo requerido
+                  </small>
+                </div>
+              </div>
+              <div class="col-12" *ngIf="suppliersFiltrados.length > 0 && showDropdown">
+                <div class="card shadow-sm position-absolute" style="z-index: 1000; width: 95%; margin-top: 2px;">
+                  <ul class="list-group list-group-flush p-0" style="max-height: 200px; overflow-y: auto; margin-bottom: 0;">
+                    <li class="list-group-item disabled py-1 text-muted" style="font-size: 0.85rem;">
+                      -- Selecciona una opción --
+                    </li>
+                    
+                    <li *ngFor="let item of suppliersFiltrados" 
+                        class="list-group-item list-group-item-action py-2"
+                        (mousedown)="seleccionarSupplier(item)" 
+                        style="cursor: pointer;">
+                      <div class="flex-grow-1">
+                        <div class="font-weight-bold text-dark">{{ item.razon_social }}</div>
+                        <small class="text-muted">
+                          {{ item.categoria || 'Sin Categoría' }}
+                        </small>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <!-- <ul style="height: 150px !important; overflow-y: auto;" class="list-unstyled mb-0">
+                  <li class="text-muted"> -- Selecciona una opción -- </li>
+                  <li *ngFor="let item of suppliersFiltrados" style="margin-top: 5px;">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div (mousedown)="seleccionarSupplier(item)" style="cursor: pointer;">
+                        <div>{{ item.razon_social }}</div>
+                        <div class="text-muted" style="font-size: 0.85rem;">{{ item.categoria || 'Sin Categoría' }}</div>
+                      </div>
+                    </div>
+                  </li>
+                </ul> -->
+              </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-12">
+            <div class="form-group">
+                <label class="form-control-label" for="input-modelo">Modelo</label>
+                <input type="text" id="input-modelo" class="form-control" placeholder="Modelo" formControlName="modelo" [class.is-invalid]="modeloNoValido">
+                <small *ngIf="modeloNoValido" class="text-danger">
+                    Campo requerido
+                </small>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-12">
+            <div class="form-group">
+                <label class="form-control-label" for="input-talla">Talla</label>
+                <input type="text" id="input-talla" class="form-control" placeholder="Talla" formControlName="talla" [class.is-invalid]="tallaNoValido">
+                <small *ngIf="tallaNoValido" class="text-danger">
+                    Campo requerido
+                </small>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-12">
+            <div class="form-group">
+                <label class="form-control-label" for="input-colo">Color</label>
+                <input type="text" id="input-color" class="form-control" placeholder="Color" formControlName="color" [class.is-invalid]="colorNoValido">
+                <small *ngIf="colorNoValido" class="text-danger">
+                    Campo requerido
+                </small>
+            </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4 col-sm-12">
+            <div class="form-group">
+                <label class="form-control-label" for="input-cantidad">Cantidad</label>
+                <input type="number" id="input-cantidad" class="form-control" placeholder="Cantidad" formControlName="cantidad" [class.is-invalid]="cantidadNoValido">
+                <small *ngIf="cantidadNoValido" class="text-danger">
+                    Campo requerido
+                </small>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-12">
+            <div class="form-group">
+                <label class="form-control-label" for="input-precio_unitario">Precio Unitario</label>
+                <input type="number" id="input-precio_unitario" class="form-control" placeholder="Precio Unitario" formControlName="precio_unitario" [class.is-invalid]="precio_unitarioNoValido">
+                <small *ngIf="precio_unitarioNoValido" class="text-danger">
+                    Campo requerido
+                </small>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-12">
+            <div class="form-group">
+                <label class="form-control-label" for="input-subtotal">Importe</label>
+                <input type="number" id="input-subtotal" class="form-control" placeholder="Importe" formControlName="subtotal" [class.is-invalid]="subtotalNoValido" style="cursor: not-allowed">
+                <small *ngIf="subtotalNoValido" class="text-danger">
+                    Campo requerido
+                </small>
+            </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12" style="text-align: right">
+          <button style="display: inline-block;" type="button" class="btn btn-tn btn-info" 
+            title="Refresh" (click)="cancelarConcepto()"> 
+              Cancelar
+          </button>
+          <button style="display: inline-block;" type="button" class="btn btn-tn btn-info" 
+            title="Refresh" (click)="agregarConcepto()"> 
+              Guardar concepto
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <div class="row" [hidden]="conceptos.length == 0 || flag_new_concepto" style="margin-top: 20px;">
+      <div class="col-12"> 
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th scope="col">Proveedor</th>
+              <th scope="col">Modelo</th>
+              <th scope="col">Talla</th>
+              <th scope="col">Color</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Precio Unitario</th>
+              <th scope="col">Importe</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of conceptos; index as i">
+              <td>{{item.supplier.razon_social}}</td>
+              <td>{{item.modelo}}</td>
+              <td>{{item.talla}}</td>
+              <td>{{item.color}}</td>
+              <td>{{item.cantidad | number: '1.2-2'}}</td>
+              <td>{{item.precio_unitario | number: '1.2-2'}}</td>
+              <td>{{item.subtotal | number: '1.2-2'}}</td>
+              <td >
+                <button type="button" class="btn btn-tn btn-danger" title="Eliminar concepto" (click)="eliminarConcepto(i, item)">
+                  <i class="fa fa-trash"></i>
+                </button>
+                <button type="button" class="btn btn-tn btn-danger" title="Editar concepto" (click)="editarConcepto(i, item)">
+                  <i class="fa fa-pencil"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+    <div class="row" [hidden]="conceptos.length == 0 || flag_new_concepto" style="margin-top: 20px;">
+        <div class="col-md-4 col-sm-12">
+            <div class="form-group">
+                <label class="form-control-label" for="input-subtotal">Subtotal</label>
+                <input type="text" id="input-subtotal" class="form-control" placeholder="Subtotal" formControlName="subtotal" [class.is-invalid]="subtotalNoValido" style="cursor: not-allowed">
+                <small *ngIf="subtotalNoValido" class="text-danger">
+                    Campo requerido
+                </small>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-12">
+            <div class="form-group">
+                <label class="form-control-label" for="input-envio">Envío</label>
+                <input type="number" id="input-envio" class="form-control" placeholder="Envío" formControlName="envio" [class.is-invalid]="envioNoValido" (keyup)="envioKeyup()">
+                <small *ngIf="envioNoValido" class="text-danger">
+                    Campo requerido
+                </small>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-12">
+            <div class="form-group">
+                <label class="form-control-label" for="input-total">Total</label>
+                <input type="text" id="input-total" class="form-control" placeholder="Total" formControlName="total" [class.is-invalid]="totalNoValido" style="cursor: not-allowed">
+                <small *ngIf="totalNoValido" class="text-danger">
+                    Campo inválido
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" class="row" [hidden]="conceptos.length == 0 || flag_new_concepto" style="margin-top: 20px;">
+        <div class="col-12" style="text-align: right">
+          <button style="display: inline-block;" type="button" class="btn btn-tn btn-info" 
+            title="Atrás" (click)="atras()"> 
+              Atrás
+          </button>
+          <button style="display: inline-block;" type="button" class="btn btn-tn btn-info" 
+            title="Guardar cotización" (click)="guardar()"> 
+              Guardar cotización
+          </button>
+        </div>
+    </div>
+
+  </form>
+
+</div>
+
+<!-- MODAL REGISTRAR PAGO -->
+<ng-template #modalPago id="modalPago" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Registrar Pago — {{ cotizacionSeleccionada?.folio }}</h4>
+    <button type="button" class="close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body" *ngIf="modalPagoVisible">
+
+    <p>Total: <strong>{{ cotizacionSeleccionada?.total | currency: cotizacionSeleccionada?.moneda }}</strong></p>
+    <p>Total pagado: 
+      <strong style="color:#28a745">
+        {{ cotizacionSeleccionada?.total_pagado | currency: cotizacionSeleccionada?.moneda }}
+      </strong>
+    </p>
+    <p>Saldo restante: 
+      <strong style="color:#f0ad4e">
+        {{ cotizacionSeleccionada?.saldo_restante | currency: cotizacionSeleccionada?.moneda }}
+      </strong>
+    </p>
+
+    <hr>
+
+    <div class="row">
+      <div class="col-12" style="margin-top:14px;">
+        <label class="form-control-label">Monto</label>
+        <input type="number" 
+          [(ngModel)]="formPago.monto" 
+          class="form-control"
+          [max]="cotizacionSeleccionada?.saldo_restante"
+          min="0.01"
+          placeholder="0.00">
+        <small class="text-danger" *ngIf="formPago.monto > cotizacionSeleccionada?.saldo_restante">
+          El monto no puede ser mayor al saldo restante.
+        </small>
+      </div>
+
+      <div class="col-12" style="margin-top:14px;">
+        <label class="form-control-label">Tipo de pago</label>
+        <select [(ngModel)]="formPago.tipo" class="form-control">
+          <option value="efectivo">Efectivo</option>
+          <option value="transferencia">Transferencia</option>
+        </select>
+      </div>
+
+      <div class="col-12" style="margin-top:14px;">
+        <label class="form-control-label">Referencia (opcional)</label>
+        <input type="text" [(ngModel)]="formPago.referencia" class="form-control" placeholder="Nro. transferencia">
+      </div>
+
+      <div class="col-12" style="margin-top:14px;">
+        <label class="form-control-label">Fecha</label>
+        <input type="date" [(ngModel)]="formPago.fecha" class="form-control">
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click'); cerrarModalPago()">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" 
+      (click)="confirmarPago()"
+      [disabled]="!formPago.monto || formPago.monto <= 0 || formPago.monto > cotizacionSeleccionada?.saldo_restante">
+      Confirmar Pago
+    </button>
+  </div>
+</ng-template>
+
+<!-- MODAL DETALLE DE PAGOS -->
+<ng-template #modalDetalle id="modalDetalle" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Detalle de Pagos — {{ cotizacionSeleccionada?.folio }}</h4>
+    <button type="button" class="close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body" *ngIf="modalDetalleVisible">
+
+    <p>Estado: 
+      <span [ngClass]="{
+        'badge-pendiente':  cotizacionSeleccionada?.pago_estado === 'pendiente',
+        'badge-adelantado': cotizacionSeleccionada?.pago_estado === 'adelantado',
+        'badge-pagado':     cotizacionSeleccionada?.pago_estado === 'pagado'
+      }">
+        {{ cotizacionSeleccionada?.pago_estado | uppercase }}
+      </span>
+    </p>
+
+    <hr>
+
+    <!-- LISTADO DE PAGOS -->
+    <div *ngIf="cotizacionSeleccionada?.pagos?.length > 0; else sinPagos">
+      <table class="tabla-detalle" style="width:100%">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Monto</th>
+            <th>Tipo</th>
+            <th>Fecha</th>
+            <th>Referencia</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let pago of cotizacionSeleccionada?.pagos; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td><strong>{{ pago.monto | currency: cotizacionSeleccionada?.moneda }}</strong></td>
+            <td>{{ pago.tipo | titlecase }}</td>
+            <td>{{ pago.fecha | date: 'dd/MM/yyyy' }}</td>
+            <td>{{ pago.referencia || '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #sinPagos>
+      <p style="color:#888">Sin pagos registrados.</p>
+    </ng-template>
+
+    <hr>
+
+    <!-- RESUMEN -->
+    <table class="tabla-detalle">
+      <tr>
+        <td>Total</td>
+        <td><strong>{{ cotizacionSeleccionada?.total | currency: cotizacionSeleccionada?.moneda }}</strong></td>
+      </tr>
+      <tr>
+        <td>Total pagado&nbsp;&nbsp;</td>
+        <td style="color:#28a745">
+          <strong>{{ cotizacionSeleccionada?.total_pagado | currency: cotizacionSeleccionada?.moneda }}</strong>
+        </td>
+      </tr>
+      <tr *ngIf="cotizacionSeleccionada?.saldo_restante > 0">
+        <td>Saldo restante&nbsp;&nbsp;</td>
+        <td style="color:#f0ad4e">
+          <strong>{{ cotizacionSeleccionada?.saldo_restante | currency: cotizacionSeleccionada?.moneda }}</strong>
+        </td>
+      </tr>
+    </table>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click'); cerrarModalDetalle()">Cerrar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalTipoEntrega id="modalTipoEntrega" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Tipo de Entrega — {{ cotizacionSeleccionada?.folio }}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <div *ngIf="modalTipoEntregaVisible">
+      <p>Selecciona cómo se entregará el pedido:</p>
+
+      <div style="display:flex; gap:12px; margin: 16px 0;">
+        <button 
+          (click)="formEntrega.tipo = 'plaza'"
+          [class.selected]="formEntrega.tipo === 'plaza'"
+          style="flex:1; padding:16px;"
+          class="btn btn-tn btn-primary">
+          <i class="fa fa-building-o" aria-hidden="true"></i> Plaza
+        </button>
+        <button 
+          (click)="formEntrega.tipo = 'envio'"
+          [class.selected]="formEntrega.tipo === 'envio'"
+          style="flex:1; padding:16px;"
+          class="btn btn-tn btn-primary">
+          <i class="fa fa-truck" aria-hidden="true"></i> Envío
+        </button>
+      </div>
+
+      <div *ngIf="formEntrega.tipo">
+        <span><strong>Seleccionado:</strong> {{ formEntrega.tipo | titlecase }}</span>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click'); cerrarModalTipoEntrega()">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="confirmarTipoEntrega()" [disabled]="!formEntrega.tipo">Confirmar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalFinalizar id="modalFinalizar" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Finalizar Cotización — {{ cotizacionSeleccionada?.folio }}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <div *ngIf="modalFinalizarVisible">
+
+      <!-- Si YA tiene tipo_entrega, solo mostrar info -->
+      <ng-container *ngIf="cotizacionSeleccionada?.tipo_entrega; else asignarEntrega">
+        <p>Tipo de entrega asignado: 
+          <strong>{{ cotizacionSeleccionada?.tipo_entrega | titlecase }}</strong>
+        </p>
+        <p>¿Confirmas finalizar esta cotización?</p>
+      </ng-container>
+
+      <!-- Si NO tiene tipo_entrega, pedir que lo asigne aquí -->
+      <ng-template #asignarEntrega>
+        <p style="color:#f0ad4e;">
+          ⚠️ Esta cotización no tiene tipo de entrega asignado. Asígnalo para continuar.
+        </p>
+        <div style="display:flex; gap:12px; margin: 16px 0;">
+          <button 
+            (click)="formFinalizar.tipo_entrega = 'plaza'"
+            [class.selected]="formFinalizar.tipo_entrega === 'plaza'"
+            style="flex:1; padding:16px;"
+            class="btn btn-tn btn-primary">
+            <i class="fa fa-building-o" aria-hidden="true"></i> Plaza
+          </button>
+          <button 
+            (click)="formFinalizar.tipo_entrega = 'envio'"
+            [class.selected]="formFinalizar.tipo_entrega === 'envio'"
+            style="flex:1; padding:16px;"
+            class="btn btn-tn btn-primary">
+            <i class="fa fa-truck" aria-hidden="true"></i> Envío
+          </button>
+        </div>
+        <div *ngIf="formFinalizar.tipo_entrega">
+          <span><strong>Seleccionado:</strong> {{ formFinalizar.tipo_entrega | titlecase }}</span>
+        </div>
+      </ng-template>
+
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click'); cerrarModalFinalizar()">Cerrar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="confirmarFinalizar()" [disabled]="!cotizacionSeleccionada?.tipo_entrega && !formFinalizar.tipo_entrega">Finalizar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalCancelar id="modalCancelar" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Cancelar Cotización — {{ cotizacionSeleccionada?.folio }}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <div *ngIf="modalCancelarVisible">
+
+      <p>¿Estás seguro que deseas cancelar la cotización 
+        <strong>{{ cotizacionSeleccionada?.folio }}</strong>?
+      </p>
+      <p style="color:#888; font-size:0.9em;">Esta acción no se puede deshacer.</p>
+
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click'); cerrarModalCancelar()">No, regresar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="confirmarCancelar()">Sí, cancelar</button>
+  </div>
+</ng-template>
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

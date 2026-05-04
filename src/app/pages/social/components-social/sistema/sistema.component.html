@@ -1,0 +1,233 @@
+<br>
+<div class="row">
+  <div class="col-12" style="text-align: right">
+    <button style="display: inline-block;" type="button" class="btn btn-icon btn-tn btn-primary" title="Refresh" (click)="refreshTabla()"> <i class="fa fa-refresh icon-refresh"></i>
+    </button>
+  </div>
+</div>
+<br>
+<div class="row">
+  <div class="col-12">
+    <nav>
+      <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <a [ngClass]="{'nav-item nav-link active': selectedTab1, 'nav-item nav-link': !selectedTab1}" style="cursor: pointer;" id="nav-tab1" data-toggle="tab" role="tab" aria-controls="nav-1" aria-selected="true" (click)="selectTab(1)">Keys</a>
+        <a [ngClass]="{'nav-item nav-link active': selectedTab2, 'nav-item nav-link': !selectedTab2}" style="cursor: pointer;" id="nav-tab2" data-toggle="tab" role="tab" aria-controls="nav-2" aria-selected="true" (click)="selectTab(2)">Prompts</a>
+        <a [ngClass]="{'nav-item nav-link active': selectedTab3, 'nav-item nav-link': !selectedTab3}" style="cursor: pointer;" id="nav-tab3" data-toggle="tab" role="tab" aria-controls="nav-3" aria-selected="true" (click)="selectTab(3)">Precios</a>
+      </div>
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+      <div [ngClass]="{'tab-pane fade show active': selectedTab1, 'tab-pane fade': !selectedTab1}" id="nav-1" role="tabpanel" aria-labelledby="nav-tab1">
+
+        <br>
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-9" style="display:block; margin:auto">
+            <nb-card>
+              <nb-card-header>
+                Key de Posts - ChatGpt
+              </nb-card-header>
+              <nb-card-body>
+                <div class="form-group">
+                  <input type="text" placeholder="Key" class="form-control" [(ngModel)]="key_1"/>
+                </div>
+              </nb-card-body>
+              <nb-card-footer>
+                <div class="text-right">
+                  <button type="button" class="btn btn-tn btn-primary" (click)="updateKey1()" [disabled]="key_1 == '' ">
+                    Actualizar
+                  </button>
+                </div>
+              </nb-card-footer>
+            </nb-card>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-9" style="display:block; margin:auto">
+            <nb-card>
+              <nb-card-header>
+                Key de Escenas - ChatGpt
+              </nb-card-header>
+              <nb-card-body>
+                <div class="form-group">
+                  <input type="text" placeholder="Key" class="form-control" [(ngModel)]="key_2"/>
+                </div>
+              </nb-card-body>
+              <nb-card-footer>
+                <div class="text-right">
+                  <button type="button" class="btn btn-tn btn-primary" (click)="updateKey2()" [disabled]="key_2 == '' ">
+                    Actualizar
+                  </button>
+                </div>
+              </nb-card-footer>
+            </nb-card>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-9" style="display:block; margin:auto">
+            <nb-card>
+              <nb-card-header>
+                Key de Imagenes - Dall-E
+              </nb-card-header>
+              <nb-card-body>
+
+                <div class="row">
+                  <div class="col-12 form-group">
+                    <label for="input-marca">Consultas a Dall-E</label>&nbsp;&nbsp;
+                    <nb-checkbox [(ngModel)]="dalle" (change) = "ChangeDalle()" style="cursor:pointer;">
+                      <div *ngIf="!dalle">OFF</div>
+                      <div *ngIf="dalle">ON</div>
+                    </nb-checkbox> 
+                  </div>
+                  <br>
+                </div>
+
+                <div class="form-group">
+                  <input type="text" placeholder="Key" class="form-control" [(ngModel)]="key_3"/>
+                </div>
+              </nb-card-body>
+              <nb-card-footer>
+                <div class="text-right">
+                  <button type="button" class="btn btn-tn btn-primary" (click)="updateKey3()" [disabled]="key_3 == '' ">
+                    Actualizar
+                  </button>
+                </div>
+              </nb-card-footer>
+            </nb-card>
+          </div>
+        </div>
+        
+      </div>
+      <div [ngClass]="{'tab-pane fade show active': selectedTab2, 'tab-pane fade': !selectedTab2}" id="nav-2" role="tabpanel" aria-labelledby="nav-tab2">
+
+        <br>
+        <div class="row">
+          <div class="col-9" style="display:block; margin:auto">
+            <nb-card>
+              <nb-card-header>
+                Prompt para textos
+              </nb-card-header>
+              <nb-card-body>
+                <div class="form-group">
+                  <textarea id="prompt_textos" name="prompt_textos" rows="5" class="form-control" placeholder="Prompt" [(ngModel)]="prompt_textos"></textarea>
+                </div>
+              </nb-card-body>
+              <nb-card-footer>
+                <div class="text-right">
+                  <button type="button" class="btn btn-tn btn-primary" (click)="updatePromptTextos()" [disabled]="prompt_textos == '' ">
+                    Actualizar
+                  </button>
+                </div>
+              </nb-card-footer>
+            </nb-card>
+          </div>
+          <div class="col-9" style="display:block; margin:auto">
+            <nb-card>
+              <nb-card-header>
+                Prompt para escena sin parámetros
+              </nb-card-header>
+              <nb-card-body>
+                <div class="form-group">
+                  <textarea id="prompt_escenaA" name="prompt_escenaA" rows="5" class="form-control" placeholder="Prompt" [(ngModel)]="prompt_escenaA"></textarea>
+                </div>
+              </nb-card-body>
+              <nb-card-footer>
+                <div class="text-right">
+                  <button type="button" class="btn btn-tn btn-primary" (click)="updatePromptEscenaA()" [disabled]="prompt_escenaA == '' ">
+                    Actualizar
+                  </button>
+                </div>
+              </nb-card-footer>
+            </nb-card>
+          </div>
+          <div class="col-9" style="display:block; margin:auto">
+            <nb-card>
+              <nb-card-header>
+                Prompt para escena con parámetros
+              </nb-card-header>
+              <nb-card-body>
+                <div class="form-group">
+                  <textarea id="prompt_escenaB" name="prompt_escenaB" rows="5" class="form-control" placeholder="Prompt" [(ngModel)]="prompt_escenaB"></textarea>
+                </div>
+              </nb-card-body>
+              <nb-card-footer>
+                <div class="text-right">
+                  <button type="button" class="btn btn-tn btn-primary" (click)="updatePromptEscenaB()" [disabled]="prompt_escenaB == '' ">
+                    Actualizar
+                  </button>
+                </div>
+              </nb-card-footer>
+            </nb-card>
+          </div>
+          <div class="col-9" style="display:block; margin:auto">
+            <nb-card>
+              <nb-card-header>
+                Prompt para imagen sin parámetros
+              </nb-card-header>
+              <nb-card-body>
+                <div class="form-group">
+                  <textarea id="prompt_imagenesA" name="prompt_imagenesA" rows="4" class="form-control" placeholder="Prompt" [(ngModel)]="prompt_imagenesA"></textarea>
+                </div>
+              </nb-card-body>
+              <nb-card-footer>
+                <div class="text-right">
+                  <button type="button" class="btn btn-tn btn-primary" (click)="updatePromptImagenA()" [disabled]="prompt_imagenesA == '' ">
+                    Actualizar
+                  </button>
+                </div>
+              </nb-card-footer>
+            </nb-card>
+          </div>
+          <div class="col-9" style="display:block; margin:auto">
+            <nb-card>
+              <nb-card-header>
+                Prompt para imagen con parámetros
+              </nb-card-header>
+              <nb-card-body>
+                <div class="form-group">
+                  <textarea id="prompt_imagenesB" name="prompt_imagenesB" rows="4" class="form-control" placeholder="Prompt" [(ngModel)]="prompt_imagenesB"></textarea>
+                </div>
+              </nb-card-body>
+              <nb-card-footer>
+                <div class="text-right">
+                  <button type="button" class="btn btn-tn btn-primary" (click)="updatePromptImagenB()" [disabled]="prompt_imagenesB == '' ">
+                    Actualizar
+                  </button>
+                </div>
+              </nb-card-footer>
+            </nb-card>
+          </div>
+        </div>
+
+      </div>
+      <div [ngClass]="{'tab-pane fade show active': selectedTab3, 'tab-pane fade': !selectedTab3}" id="nav-3" role="tabpanel" aria-labelledby="nav-tab3">
+        
+        <br>
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-9" style="display:block; margin:auto">
+            <nb-card>
+              <nb-card-header>
+                Precio por Marca
+              </nb-card-header>
+              <nb-card-body>
+                <div class="form-group">
+                  <input type="number" placeholder="Costo" class="form-control" [(ngModel)]="costo_marca" min="0"/>
+                </div>
+              </nb-card-body>
+              <nb-card-footer>
+                <div class="text-right">
+                  <button type="button" class="btn btn-tn btn-primary" (click)="updateCostoMarca()" [disabled]="costo_marca == '' ">
+                    Actualizar
+                  </button>
+                </div>
+              </nb-card-footer>
+            </nb-card>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

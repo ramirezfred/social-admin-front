@@ -1,0 +1,41 @@
+// themes - our custom or/and out of the box themes
+@import 'themes';
+
+// framework component themes (styles tied to theme variables)
+@import '~@nebular/theme/styles/globals';
+@import '~@nebular/auth/styles/all';
+
+// loading progress bar theme
+@import './pace.theme';
+
+// install the framework and custom global styles
+@include nb-install() {
+
+  // framework global styles
+  @include nb-theme-global();
+  @include nb-auth-global();
+
+  // loading progress bar
+  @include ngx-pace-theme();
+};
+
+.badge-pendiente  { 
+  background: #555;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.badge-adelantado { 
+  background: #f0ad4e;
+  color: #000;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.badge-pagado { 
+  background: #28a745;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+}

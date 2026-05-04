@@ -1,0 +1,139 @@
+<br>
+<div class="row">
+  <div class="col-12" style="text-align: right">
+    <button style="display: inline-block;" type="button" class="btn btn-icon btn-tn btn-primary" title="Refresh" (click)="refreshTabla()"> <i class="fa fa-refresh icon-refresh"></i>
+    </button>
+  </div>
+</div>
+<br>
+<div class="row">
+  <div class="col-12" style="text-align: right">
+    <button style="display: inline-block;" type="button" class="btn btn-tn btn-primary" title="Crear" (click)="aCrear()">
+      Crear
+    </button>
+  </div>
+</div>
+<br>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">    
+      <div class="input-group">
+        <input placeholder="Buscar..." class="form-control" type="text" id="inputTermino2" [(ngModel)]="inputTermino" (ngModelChange)="FilterByTermino()"/> 
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+
+<div class="row">
+  <div class="col-12"> 
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th >Palabra clave</th>
+            <th >Prompt</th>
+            <th >Acciones</th>
+          </tr>
+        </thead>  
+        <tbody>
+          <tr *ngFor="let item of items; let i = index" >
+            <td >{{item.palabra_clave}}</td>
+            <td>
+              <div class="row">
+                <div class="col-12" style="max-width: 500px;">
+                  <p class="parrafo">{{item.prompt}}</p>
+                </div>
+              </div>
+            </td>
+            <td >
+              <button style="margin-top: 4px;" type="button" class="btn btn-tn btn-primary" title="Editar" (click)="aEditar(item, i)">Editar</button>
+              <button style="margin-top: 4px;" type="button" class="btn btn-tn btn-primary" title="Eliminar" (click)="open(modalEliminar);aEliminar(item, i)">Eliminar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<br>
+<div class="row">
+  <div class="col-12"> 
+    <div class="btn-toolbar" role="toolbar" style="margin: 0;">
+      <div class="btn-group">
+         <label style="margin-top:10px">Página {{currentIndex}}/{{pageNumber}} </label>
+      </div>
+      <div class="btn-group pull-right">
+         <ul class="pagination" >
+            <li class="page-item" [ngClass]="{'disabled': (currentIndex == 1 || pageNumber == 0)}" ><a class="page-link"  (click)="prevPage()" >Atrás</a></li>
+            <li class="page-item" *ngFor="let page of pagesIndex"  [ngClass]="{'active': (currentIndex == page)}">
+              <a class="page-link" (click)="setPage(page)"  >{{page}} </a>
+            </li>
+            <li class="page-item" [ngClass]="{'disabled': (currentIndex == pageNumber || pageNumber == 0)}" ><a class="page-link"   (click)="nextPage()" >Siguiente</a></li>
+         </ul>
+      </div>
+    </div> 
+  </div>
+</div>
+
+<ng-template #modalConfig let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Configuración: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="myForm" autocomplete="nope">
+      <div class="row">
+        <div class="col-12 form-group">
+          <label for="input-palabra_clave">Palabra clave</label>
+          <input type="text" name="palabra_clave" formControlName="palabra_clave" id="input-palabra_clave" class="form-control" placeholder="Palabra clave" [class.control-invalid]="palabra_claveNoValido" (keyup)="palabra_claveKeyup()">
+          <small *ngIf="palabra_claveNoValido" style="color: #dc3545 !important;">
+            Requerido (3-20 dígitos)
+          </small>
+        </div>
+        <div class="col-12 form-group">
+          <label for="input-prompt">Prompt</label>
+          <textarea id="textarea-input" name="textarea-input" rows="9" class="form-control" placeholder="Prompt" formControlName="prompt" [class.control-invalid]="promptNoValido"></textarea>
+          <small *ngIf="promptNoValido" style="color: #dc3545 !important;">
+            Requerido (10-4800 dígitos)
+          </small>
+        </div>
+      </div>
+    </form>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')" #btnAtras id="btnAtras">Atrás</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="guardar()">Aceptar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalEliminar id="modalEliminar" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Eliminar prompt: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <p>
+      <strong>¿Realmente desea eliminar este prompt?</strong>
+    </p>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="c('Close click');eliminar()">Aceptar</button>
+  </div>
+</ng-template>
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

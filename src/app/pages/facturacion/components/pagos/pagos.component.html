@@ -1,0 +1,104 @@
+<br>
+<div>
+  <div class="row">
+    <div class="col-12" style="text-align: right">
+      <button style="display: inline-block;" type="button" class="btn btn-icon btn-tn btn-primary" title="Refresh" (click)="refreshTabla()"> <i class="fa fa-refresh icon-refresh"></i>
+      </button>
+    </div>
+  </div>
+  <br>
+  <div class="row align-items-center">
+    <div class="col-md-6 ml-auto">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4">
+            <label for="monthSelector">Mes:</label>
+            <select class="form-control" id="monthSelector" [(ngModel)]="selectedMonth">
+              <option *ngFor="let month of months" [value]="month.value">{{ month.name }}</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="yearSelector">Año:</label>
+            <select class="form-control" id="yearSelector" [(ngModel)]="selectedYear">
+              <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <button style="margin-top: 32px;" class="btn btn-tn btn-primary" (click)="getListado()">Buscar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">    
+        <div class="input-group">
+          <input placeholder="Buscar..." class="form-control" type="text" id="inputTermino2" [(ngModel)]="inputTermino" (ngModelChange)="FilterByTermino()"/> 
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+
+  <div class="row">
+    <div class="col-12"> 
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th >ID</th>
+              <th >Fecha</th>
+              <th >Email</th>
+              <th >Rfc</th>
+              <th >Razón social</th>
+              <th >Facturas</th>
+              <th >Costo Factura</th>
+              <th >Total</th>
+            </tr>
+          </thead>  
+          <tbody>
+            <tr *ngFor="let item of items; let i = index" >
+                
+              <td >{{item.id}}</td>
+              <td >{{item.created_at}}</td>
+              <td >{{item.user.email}}</td>
+              <td >{{item.user.empresa.Rfc}}</td>
+              <td >{{item.user.empresa.RazonSocial}}</td>
+              <td >{{item.count_facturas}}</td>
+              <td >{{item.costo_factura | number: '1.2-2'}}</td>
+              <td >{{item.total | number: '1.2-2'}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <br>
+  <div class="row">
+    <div class="col-12"> 
+      <div class="btn-toolbar" role="toolbar" style="margin: 0;">
+        <div class="btn-group">
+           <label style="margin-top:10px">Página {{currentIndex}}/{{pageNumber}} </label>
+        </div>
+        <div class="btn-group pull-right">
+           <ul class="pagination" >
+              <li class="page-item" [ngClass]="{'disabled': (currentIndex == 1 || pageNumber == 0)}" ><a class="page-link"  (click)="prevPage()" >Atrás</a></li>
+              <li class="page-item" *ngFor="let page of pagesIndex"  [ngClass]="{'active': (currentIndex == page)}">
+                <a class="page-link" (click)="setPage(page)"  >{{page}} </a>
+              </li>
+              <li class="page-item" [ngClass]="{'disabled': (currentIndex == pageNumber || pageNumber == 0)}" ><a class="page-link"   (click)="nextPage()" >Siguiente</a></li>
+           </ul>
+        </div>
+      </div> 
+    </div>
+  </div>
+</div>
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

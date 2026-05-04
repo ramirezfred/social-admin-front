@@ -1,0 +1,90 @@
+<div class="row">
+  <div class="col-12">
+  
+    <nb-card>
+      <nb-card-body>
+
+        <br>
+        <nav>
+          <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a [ngClass]="{'nav-item nav-link active': selectedTAB1, 'nav-item nav-link': !selectedTAB1}" style="cursor: pointer;" id="nav-tab1" data-toggle="tab" role="tab" aria-controls="nav-1" aria-selected="true" (click)="selectTAB(1)">Social</a>
+            <!-- 
+             -->
+          </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+          <div [ngClass]="{'tab-pane fade show active': selectedTAB1, 'tab-pane fade': !selectedTAB1}" id="nav-1" role="tabpanel" aria-labelledby="nav-tab1">
+        
+            <br>
+            <nav>
+              <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <a [ngClass]="{'nav-item nav-link active': selectedTab1, 'nav-item nav-link': !selectedTab1}" style="cursor: pointer;" id="nav-tab1" data-toggle="tab" role="tab" aria-controls="nav-1" aria-selected="true" (click)="selectTab(1)">Usuarios</a>
+                <a [ngClass]="{'nav-item nav-link active': selectedTab2, 'nav-item nav-link': !selectedTab2}" style="cursor: pointer;" id="nav-tab2" data-toggle="tab" role="tab" aria-controls="nav-2" aria-selected="true" (click)="selectTab(2)">Posts</a>
+                <a [ngClass]="{'nav-item nav-link active': selectedTab3, 'nav-item nav-link': !selectedTab3}" style="cursor: pointer;" id="nav-tab3" data-toggle="tab" role="tab" aria-controls="nav-3" aria-selected="true" (click)="selectTab(3)">Sistema</a>
+                <a [ngClass]="{'nav-item nav-link active': selectedTab4, 'nav-item nav-link': !selectedTab4}" style="cursor: pointer;" id="nav-tab4" data-toggle="tab" role="tab" aria-controls="nav-4" aria-selected="true" (click)="selectTab(4)">Marcos</a>
+                <a [ngClass]="{'nav-item nav-link active': selectedTab5, 'nav-item nav-link': !selectedTab5}" style="cursor: pointer;" id="nav-tab5" data-toggle="tab" role="tab" aria-controls="nav-5" aria-selected="true" (click)="selectTab(5)">Imagenes</a>
+                <a [ngClass]="{'nav-item nav-link active': selectedTab6, 'nav-item nav-link': !selectedTab6}" style="cursor: pointer;" id="nav-tab6" data-toggle="tab" role="tab" aria-controls="nav-6" aria-selected="true" (click)="selectTab(6)">Post General</a>
+              </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+              <div [ngClass]="{'tab-pane fade show active': selectedTab1, 'tab-pane fade': !selectedTab1}" id="nav-1" role="tabpanel" aria-labelledby="nav-tab1">
+                <social-usuarios></social-usuarios>
+              </div>
+              <div [ngClass]="{'tab-pane fade show active': selectedTab2, 'tab-pane fade': !selectedTab2}" id="nav-2" role="tabpanel" aria-labelledby="nav-tab2">
+                <social-posts></social-posts>
+              </div>
+              <div [ngClass]="{'tab-pane fade show active': selectedTab3, 'tab-pane fade': !selectedTab3}" id="nav-3" role="tabpanel" aria-labelledby="nav-tab3">
+                <social-sistema></social-sistema>
+              </div>
+              <div [ngClass]="{'tab-pane fade show active': selectedTab4, 'tab-pane fade': !selectedTab4}" id="nav-4" role="tabpanel" aria-labelledby="nav-tab4">
+                <social-marcos></social-marcos>
+              </div>
+              <div [ngClass]="{'tab-pane fade show active': selectedTab5, 'tab-pane fade': !selectedTab5}" id="nav-5" role="tabpanel" aria-labelledby="nav-tab5">
+                <social-imagenes></social-imagenes>
+              </div>
+              <div [ngClass]="{'tab-pane fade show active': selectedTab6, 'tab-pane fade': !selectedTab6}" id="nav-6" role="tabpanel" aria-labelledby="nav-tab6">
+                <social-post-general></social-post-general>
+              </div>
+            </div>
+
+          </div>
+          <!-- <div [ngClass]="{'tab-pane fade show active': selectedTAB2, 'tab-pane fade': !selectedTAB2}" id="nav-2" role="tabpanel" aria-labelledby="nav-tab2">
+
+            <br>
+            <nav>
+              <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <a [ngClass]="{'nav-item nav-link active': selectedTabB1, 'nav-item nav-link': !selectedTabB1}" style="cursor: pointer;" id="nav-tab1" data-toggle="tab" role="tab" aria-controls="nav-1" aria-selected="true" (click)="selectTabB(1)">Usuarios</a>
+                <a [ngClass]="{'nav-item nav-link active': selectedTabB2, 'nav-item nav-link': !selectedTabB2}" style="cursor: pointer;" id="nav-tab2" data-toggle="tab" role="tab" aria-controls="nav-2" aria-selected="true" (click)="selectTabB(2)">Prompts</a>
+                <a [ngClass]="{'nav-item nav-link active': selectedTabB3, 'nav-item nav-link': !selectedTabB3}" style="cursor: pointer;" id="nav-tab3" data-toggle="tab" role="tab" aria-controls="nav-3" aria-selected="true" (click)="selectTabB(3)">Sistema</a>
+              </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+              <div [ngClass]="{'tab-pane fade show active': selectedTabB1, 'tab-pane fade': !selectedTabB1}" id="nav-1" role="tabpanel" aria-labelledby="nav-tab1">
+                <bot-usuarios></bot-usuarios>
+              </div>
+              <div [ngClass]="{'tab-pane fade show active': selectedTabB2, 'tab-pane fade': !selectedTabB2}" id="nav-2" role="tabpanel" aria-labelledby="nav-tab2">
+                <bot-config></bot-config>
+              </div>
+              <div [ngClass]="{'tab-pane fade show active': selectedTabB3, 'tab-pane fade': !selectedTabB3}" id="nav-3" role="tabpanel" aria-labelledby="nav-tab3">
+                <bot-sistema></bot-sistema>
+              </div>
+            </div>
+
+          </div> -->
+        </div>
+
+        
+        
+      </nb-card-body>
+    </nb-card>
+
+  </div>
+</div>
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>
+
+

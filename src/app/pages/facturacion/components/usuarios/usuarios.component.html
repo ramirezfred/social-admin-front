@@ -1,0 +1,498 @@
+<br>
+<div *ngIf="flag_vista == 1">
+  <div class="row">
+    <div class="col-12" style="text-align: right">
+      <button style="display: inline-block;" type="button" class="btn btn-icon btn-tn btn-primary" title="Refresh" (click)="refreshTabla()"> <i class="fa fa-refresh icon-refresh"></i>
+      </button>
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-12" style="text-align: right">
+      <button style="display: inline-block;" type="button" class="btn btn-tn btn-primary" title="Crear usuario" (click)="aCrear()">
+        Crear usuario
+      </button>
+    </div>
+  </div>
+  <br>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">    
+        <div class="input-group">
+          <input placeholder="Buscar..." class="form-control" type="text" id="inputTermino2" [(ngModel)]="inputTermino" (ngModelChange)="FilterByTermino()"/> 
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+
+  <div class="row">
+    <div class="col-12"> 
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th >ID</th>
+              <th >Fecha de alta</th>
+              <th >Email</th>
+              <th >Teléfono</th>
+              <th >Rfc</th>
+              <th >Razón social</th>
+              <th >Link</th>
+              <th >Facturas</th>
+              <th >Costo Factura</th>
+              <th >Deuda</th>
+              <th >Status</th>
+              <th >Acciones</th>
+            </tr>
+          </thead>  
+          <tbody>
+            <tr *ngFor="let item of items; let i = index" >
+                
+              <td >{{item.id}}</td>
+              <td >{{item.created_at}}</td>
+              <td >{{item.email}}</td>
+              <td >
+                {{item.telefono}}&nbsp;
+                <a href="https://wa.me/{{item.telefono}}" target="_blank">
+                  <i class="fa fa-whatsapp whatsapp-icon"></i>
+                </a>
+              </td>
+              <td >{{item.empresa.Rfc}}</td>
+              <td >{{item.empresa.RazonSocial}}</td>
+              <td >
+                <a href="https://facturacion.internow.com.mx/{{item.dominio}}" class="link" target="_blank">Link</a>
+              </td>
+              <td >{{item.count_facturas}}</td>
+              <td >{{item.costo_factura | number: '1.2-2'}}</td>
+              <td >{{item.deuda_total | number: '1.2-2'}}</td>
+              <td >
+                <nb-checkbox [(ngModel)]="item.status" (change) = "ChangeStatus(item)" style="cursor:pointer;">
+                  <div *ngIf="!item.status">OFF</div>
+                  <div *ngIf="item.status">ON</div>
+                </nb-checkbox>
+              </td>
+              <td >
+                <button style="margin-top: 4px;" type="button" class="btn btn-tn btn-primary" title="Editar Usuario" (click)="aEditar(item, i)">Editar Usuario</button>
+                <button style="margin-top: 4px;" type="button" class="btn btn-tn btn-primary" title="Eliminar Usuario" (click)="open(modalEliminarUser);aEliminarUser(item, i)">Eliminar Usuario</button>
+                <button style="margin-top: 4px;" type="button" class="btn btn-tn btn-primary" title="Pagar Deuda" (click)="open(modalPagar);aPagar(item, i)" [disabled]="item.deuda_total == 0">Pagar Deuda</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <br>
+  <div class="row">
+    <div class="col-12"> 
+      <div class="btn-toolbar" role="toolbar" style="margin: 0;">
+        <div class="btn-group">
+           <label style="margin-top:10px">Página {{currentIndex}}/{{pageNumber}} </label>
+        </div>
+        <div class="btn-group pull-right">
+           <ul class="pagination" >
+              <li class="page-item" [ngClass]="{'disabled': (currentIndex == 1 || pageNumber == 0)}" ><a class="page-link"  (click)="prevPage()" >Atrás</a></li>
+              <li class="page-item" *ngFor="let page of pagesIndex"  [ngClass]="{'active': (currentIndex == page)}">
+                <a class="page-link" (click)="setPage(page)"  >{{page}} </a>
+              </li>
+              <li class="page-item" [ngClass]="{'disabled': (currentIndex == pageNumber || pageNumber == 0)}" ><a class="page-link"   (click)="nextPage()" >Siguiente</a></li>
+           </ul>
+        </div>
+      </div> 
+    </div>
+  </div>
+</div>
+
+<div *ngIf="flag_vista == 2">
+  <div class="row">
+    <div class="col-12" style="text-align: right">
+      <button style="display: inline-block;" type="button" class="btn btn-tn btn-primary" title="Atrás" (click)="atras()">
+        Atrás
+      </button>
+    </div>
+  </div>
+  <br>
+
+  <form autocomplete="off" [formGroup]="myForm" >
+
+    <h6 class="heading-small text-muted mb-4">Ingresa los datos de Usuario</h6>
+    <div class="pl-lg-4">
+      <div class="row">
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-email">Email</label>
+            <input type="text" id="input-email" class="form-control" placeholder="Email" formControlName="email" [class.is-invalid]="emailNoValido" (keyup)="emailKeyup()">
+            <small *ngIf="emailNoValido" class="text-danger">
+              Campo requerido
+            </small>
+          </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-telefono">Teléfono</label>
+            <input type="text" id="input-telefono" class="form-control" placeholder="Teléfono" formControlName="telefono" [class.is-invalid]="telefonoNoValido">
+            <small *ngIf="telefonoNoValido" class="text-danger">
+              Campo requerido
+            </small>
+          </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-password">Password</label>
+            <input type="password" id="input-password" class="form-control" placeholder="Password" formControlName="password" [class.is-invalid]="passwordNoValido" autocomplete="off">
+            <small *ngIf="passwordNoValido" class="text-danger">
+              Campo requerido
+            </small>
+          </div>
+        </div> 
+
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-password2">Repetir password</label>
+            <input type="password" id="input-password2" class="form-control" placeholder="Repetir password" formControlName="password2" [class.is-invalid]="password2NoValido" autocomplete="off">
+            <small *ngIf="password2NoValido" class="text-danger">
+              Campo requerido
+            </small>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <hr class="my-4" />
+    <h6 class="heading-small text-muted mb-4">Subdominio</h6>
+    <div class="pl-lg-4">
+      <div class="row">
+        <div class="col-12">
+          <a href="https://facturacion.internow.com.mx/{{this.myForm.value.dominio}}" class="link" target="_blank">https://facturacion.internow.com.mx/{{this.myForm.value.dominio}}</a>
+        </div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="col-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-dominio">Subdominio</label>
+            <input type="text" id="input-dominio" class="form-control" placeholder="Subdominio" formControlName="dominio" [class.is-invalid]="dominioNoValido" (keyup)="dominioKeyup()">
+            <small *ngIf="dominioNoValido" class="text-danger">
+              Campo requerido (Solo letras y números)
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="my-4" />
+    <h6 class="heading-small text-muted mb-4">Adjunta el logo en PNG</h6>
+    <div class="pl-lg-4">
+      <div class="row">
+        <div class="col-12">
+          <label for="imagen">Logo (PNG)</label>
+          <input type="file" name="imagen" id="imagen" (change)="capturarFile($event)" #fileInput accept="image/png">
+        </div>
+        <div class="col-12 text-center">
+          <img *ngIf="previsualizacion" src="{{previsualizacion}}" alt="" style="max-height: 220px; width: auto;">
+        </div>
+      </div>
+    </div>
+
+    <hr class="my-4" />
+    <h6 class="heading-small text-muted mb-4">Selecciona los colores de la marca</h6>
+    <div class="pl-lg-4">
+
+      <div class="row">
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-color_aa">Seleccione</label>
+            <input style="cursor: pointer; height: 50px;" type="color" id="input-color_aa" class="form-control" formControlName="color_a" (ngModelChange)="modelChangedA($event)">
+          </div>
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-color_a">Hexadecimal</label>
+            <input type="text" id="input-color_a" class="form-control" placeholder="Hexadecimal" formControlName="color_aa" [class.is-invalid]="color_aNoValido">
+            <small *ngIf="color_aNoValido" class="text-danger">
+              Campo requerido
+            </small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-color_bb">Seleccione</label>
+            <input style="cursor: pointer; height: 50px;" type="color" id="input-color_bb" class="form-control" formControlName="color_b" (ngModelChange)="modelChangedB($event)">
+          </div>
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-color_b">Hexadecimal</label>
+            <input type="text" id="input-color_b" class="form-control" placeholder="Hexadecimal" formControlName="color_bb" [class.is-invalid]="color_bNoValido">
+            <small *ngIf="color_bNoValido" class="text-danger">
+              Campo requerido
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-color_cc">Seleccione</label>
+            <input style="cursor: pointer; height: 50px;" type="color" id="input-color_cc" class="form-control" formControlName="color_c" (ngModelChange)="modelChangedC($event)">
+          </div>
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-color_c">Hexadecimal</label>
+            <input type="text" id="input-color_c" class="form-control" placeholder="Hexadecimal" formControlName="color_cc" [class.is-invalid]="color_cNoValido">
+            <small *ngIf="color_cNoValido" class="text-danger">
+              Campo requerido
+            </small>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <hr class="my-4" />
+    <h6 class="heading-small text-muted mb-4">Ingresa los datos de Contribuyente</h6>
+    <div class="pl-lg-4">
+      <div class="row">
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-Rfc">Rfc</label>
+            <input type="text" id="input-Rfc" class="form-control" placeholder="Rfc" formControlName="Rfc" [class.is-invalid]="RfcNoValido" (keyup)="rfcKeyup()">
+            <small *ngIf="RfcNoValido" class="text-danger">
+              12 pos. personas morales y 13 pos. personas físicas
+            </small>
+          </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-RazonSocial">Razón Social <span style="color: red;">(tal como se presenta en el SAT)</span></label>
+            <input type="text" id="input-RazonSocial" class="form-control" placeholder="Razón Social" formControlName="RazonSocial" [class.is-invalid]="RazonSocialNoValido" (keyup)="razonSocialKeyup()">
+            <small *ngIf="RazonSocialNoValido" class="text-danger">
+              Campo requerido
+            </small>
+          </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-RegimenFiscal">Régimen Fiscal</label>
+            <select class="form-control" id="input-RegimenFiscal" formControlName="RegimenFiscal" [class.is-invalid]="RegimenFiscalNoValido">
+              <option disabled selected>Seleccione</option>
+              <option *ngFor="let regimen of catalogoRegimenFiscal" [value]="regimen.id">{{regimen.texto}}</option>
+            </select>
+            <small *ngIf="RegimenFiscalNoValido" class="text-danger">
+              Campo requerido
+            </small>
+          </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-CP">Código Postal</label>
+            <input type="text" id="input-CP" class="form-control" placeholder="Código Postal" formControlName="CP" [class.is-invalid]="CPNoValido">
+            <small *ngIf="CPNoValido" class="text-danger">
+              Campo requerido (5 dígitos)
+            </small>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <hr class="my-4" />
+    <div class="pl-lg-4">
+      <div class="row">
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-pass">Password de clave privada</label>
+            <input type="password" id="input-pass" class="form-control" placeholder="Password de clave privada" formControlName="pass" [class.is-invalid]="passNoValido" autocomplete="off">
+            <small *ngIf="passNoValido" class="text-danger">
+              Campo requerido
+            </small>
+          </div>
+        </div> 
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-pass2">Repetir password de clave privada</label>
+            <input type="password" id="input-pass2" class="form-control" placeholder="Repetir password de clave privada" formControlName="pass2" [class.is-invalid]="pass2NoValido" autocomplete="off">
+            <small *ngIf="pass2NoValido" class="text-danger">
+              Campo requerido
+            </small>
+          </div>
+        </div>               
+      </div>
+    </div>
+
+    <hr class="my-4" />
+    <div class="pl-lg-4">
+      <div class="row">
+        <div class="col-xl-9 col-lg-9 col-md-9 col-sm-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-key">Clave privada CSD (.key)</label>
+            <input type="text" id="input-key" class="form-control" placeholder="key" formControlName="key" [class.is-invalid]="keyNoValido">
+            <small *ngIf="keyNoValido" class="text-danger">
+              Campo requerido
+            </small>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12 text-center">
+          <div class="form-group">
+
+            <button type="button" class="btn btn-tn btn-outline-primary" ngbTooltip="Buscar .key" (click)="cargarKey()" style="margin-top: 46px;">
+              Buscar
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row" [hidden]="true">
+        <div class="col-12">
+          <input type="file" name="key" id="fileInputKey" (change)="capturarFileKey($event)" #fileInputKey accept=".key" style="display: none;">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xl-9 col-lg-9 col-md-9 col-sm-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-cer">Certificado CSD (.cer)</label>
+            <input type="text" id="input-cer" class="form-control" placeholder="cer" formControlName="cer" [class.is-invalid]="cerNoValido">
+            <small *ngIf="cerNoValido" class="text-danger">
+              Campo requerido
+            </small>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12 text-center">
+          <div class="form-group">
+
+            <button type="button" class="btn btn-tn btn-outline-primary" ngbTooltip="Buscar .cer" (click)="cargarCer()" style="margin-top: 46px;">
+              Buscar
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row" [hidden]="true">
+        <div class="col-12">
+          <input type="file" name="cer" id="fileInputCer" (change)="capturarFileCer($event)" #fileInputCer accept=".cer" style="display: none;">
+        </div>
+      </div>
+    </div>
+
+    <hr class="my-4" />
+    <h6 class="heading-small text-muted mb-4">Costo de Factura</h6>
+    <div class="pl-lg-4">
+      <div class="row">
+        <div class="col-12">
+          <div class="form-group">
+            <label class="form-control-label" for="input-costo_factura">Costo</label>
+            <input type="number" id="input-costo_factura" class="form-control" placeholder="Costo" formControlName="costo_factura" [class.is-invalid]="costo_facturaNoValido">
+            <small *ngIf="costo_facturaNoValido" class="text-danger">
+              Campo requerido
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </form>
+
+  
+
+  <br>
+  <hr class="my-4" />
+  <div class="pl-lg-4">
+    <div class="row">
+      <div class="col-12 text-center">
+        <a class="btn btn-primary" (click)="guardar()" style="width: 80%;">Aceptar</a>
+      </div>
+      
+    </div>
+
+  </div>
+
+</div>
+
+<div id="miDiv" #divCapturar [hidden]="true">
+  <canvas #canvas></canvas>
+</div>
+
+<div id="miDiv2" #divCapturar2 [hidden]="true">
+  <canvas #canvas2></canvas>
+</div>
+
+<ng-template #modalEliminarUser id="modalEliminarUser" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Eliminar usuario: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <p>
+      <strong>¿Realmente desea eliminar este usuario?</strong>
+    </p>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="c('Close click');eliminarUser()">Aceptar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalPagar id="modalPagar" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Pagar Deuda: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <p>
+      <strong>¿Realmente desea marcar como pagada la deuda este usuario?</strong>
+    </p>
+
+    <div class="row">
+      <div class="col-12">
+        <h5>Detalle</h5>
+        <ul>
+          <li><strong>Facturas emitidas:</strong> {{selectObj.count_facturas}}</li>
+          <li><strong>Costo por factura:</strong> {{selectObj.costo_factura | number: '1.2-2'}}</li>
+          <li><strong>Deuda:</strong> {{selectObj.deuda_total | number: '1.2-2'}}</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <input type="password" placeholder="Password" class="form-control" [(ngModel)]="password_operador" maxlength="20" />
+    </div>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="c('Close click');pagar()" [disabled]="!password_operador">Aceptar</button>
+  </div>
+</ng-template>
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

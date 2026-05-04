@@ -1,0 +1,56 @@
+<br>
+<div class="row">
+  <div class="col-xl-6 col-lg-6 col-md-6 col-sm-9" style="display:block; margin:auto">
+    <nb-card>
+      <nb-card-header>
+        Precio por Usuario
+      </nb-card-header>
+      <nb-card-body>
+        <div class="form-group">
+          <input type="number" placeholder="Costo" class="form-control" [(ngModel)]="costo_bot" min="0"/>
+        </div>
+      </nb-card-body>
+      <nb-card-footer>
+        <div class="text-right">
+          <button type="button" class="btn btn-tn btn-primary" (click)="updateCostoBot()" [disabled]="costo_bot == '' ">
+            Actualizar
+          </button>
+        </div>
+      </nb-card-footer>
+    </nb-card>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xl-6 col-lg-6 col-md-6 col-sm-9" style="display:block; margin:auto">
+    <nb-card>
+      <nb-card-header>
+        Access Token
+      </nb-card-header>
+      <nb-card-body>
+        <div>
+          <p>Access Token Encriptado:</p>
+          <p style="overflow: hidden; text-overflow: ellipsis;">{{access_token}}</p>
+        </div>
+        <div class="form-group">
+          <input type="text" placeholder="Access Token" class="form-control" [(ngModel)]="access_tokenB"/>
+        </div>
+      </nb-card-body>
+      <nb-card-footer>
+        <div class="text-right">
+          <button type="button" class="btn btn-tn btn-primary" (click)="updateAccessToken()" [disabled]="access_tokenB == '' ">
+            Actualizar
+          </button>
+        </div>
+      </nb-card-footer>
+    </nb-card>
+  </div>
+</div>
+
+
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

@@ -1,0 +1,33 @@
+<div class="row">
+  <div class="col-12">
+  
+    <nb-card>
+      <nb-card-header>Cotizaciones</nb-card-header>
+      <nb-card-body>
+
+        <br>
+        <nav>
+          <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a [ngClass]="{'nav-item nav-link active': selectedTab1, 'nav-item nav-link': !selectedTab1}" style="cursor: pointer;" id="nav-tab1" data-toggle="tab" role="tab" aria-controls="nav-1" aria-selected="true" (click)="selectTab(1)">Mis cotizaciones {{count_p_cotiznes1}}</a>
+          </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+          <div [ngClass]="{'tab-pane fade show active': selectedTab1, 'tab-pane fade': !selectedTab1}" id="nav-1" role="tabpanel" aria-labelledby="nav-tab1">
+            <br>
+            <app-cotizaciones [tipo]="1" (cont_cotiznes_event)="count_p_cotiznes1 = $event"></app-cotizaciones>
+          </div>
+        </div>
+        
+      </nb-card-body>
+    </nb-card>
+
+  </div>
+</div>
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>
+
+

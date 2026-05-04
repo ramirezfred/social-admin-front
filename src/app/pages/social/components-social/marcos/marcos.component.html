@@ -1,0 +1,510 @@
+<br>
+<div class="row" [hidden]="false">
+  <div class="col-12" style="text-align: right">
+    <button style="display: inline-block;" type="button" class="btn btn-icon btn-tn btn-primary" title="Refresh" (click)="refreshTabla()" [disabled]="false"> <i class="fa fa-refresh icon-refresh"></i>
+    </button>
+  </div>
+</div>
+<br>
+<div class="row">
+  <div class="col-12">
+    <nav>
+      <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <a [ngClass]="{'nav-item nav-link active': selectedTab1, 'nav-item nav-link': !selectedTab1}" style="cursor: pointer;" id="nav-tab1" data-toggle="tab" role="tab" aria-controls="nav-1" aria-selected="true" (click)="selectTab(1)">Subir marcos</a>
+        <a [ngClass]="{'nav-item nav-link active': selectedTab2, 'nav-item nav-link': !selectedTab2}" style="cursor: pointer;" id="nav-tab2" data-toggle="tab" role="tab" aria-controls="nav-2" aria-selected="true" (click)="selectTab(2)">Editar marcos</a>
+      </div>
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+      <div [ngClass]="{'tab-pane fade show active': selectedTab1, 'tab-pane fade': !selectedTab1}" id="nav-1" role="tabpanel" aria-labelledby="nav-tab1">
+
+        <br>
+        <div class="row">
+          <div class="col-xl-5 col-lg-6 col-md-6 col-sm-9" style="display:block; margin:auto">
+            <nb-card>
+              <nb-card-header>
+                <div class="row">
+                  <div class="col-12">
+                    <select id="input-marca" class="form-control"
+                      name="marca" [(ngModel)]="marca_id" (change)="changeMarca($event.target.value)">
+                      <option *ngFor="let marca of listado" [value]="marca.id">{{marca.nombre}}</option>
+                    </select>
+                  </div>
+                </div>
+              </nb-card-header>
+              <nb-card-body>
+                <div *ngIf="imgPostBase64" id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+                  <div class="carousel-inner">
+                    <div class="carousel-item active">
+                      <img class="d-block w-100" src="{{imgPostBase64}}" alt="Slide">
+                    </div>
+                  </div>
+                  <a class="carousel-control-prev" role="button" data-slide="prev" ngClass="{'carousel-control-prev':true}" (click)="imagenAnterior()" >
+                    <span>
+                      <i style="font-size: 40px; 
+                        color: grey;" 
+                        class="fa fa-chevron-left" aria-hidden="true"></i>
+                    </span>
+                  </a>
+                  <a class="carousel-control-next" role="button" data-slide="next" ngClass="{'carousel-control-next':true}" (click)="imagenSiguiente()">
+                    <span>
+                      <i style="font-size: 40px; 
+                        color: grey;"
+                        class="fa fa-chevron-right" aria-hidden="true"></i>
+                    </span>
+                  </a>
+                </div>
+              </nb-card-body>
+              <nb-card-footer>
+                <div class="text-right">
+                  <button type="button" class="btn btn-tn btn-primary" (click)="open(modalEliminar)" [disabled]="selectImgIndex === null">
+                    Eliminar
+                  </button>
+                  <button type="button" class="btn btn-tn btn-primary" (click)="open(modalNuevo);clearImage()">
+                    Nuevo
+                  </button>
+                </div>
+              </nb-card-footer>
+            </nb-card>
+          </div>
+        </div>  
+
+      </div>
+      <div [ngClass]="{'tab-pane fade show active': selectedTab2, 'tab-pane fade': !selectedTab2}" id="nav-2" role="tabpanel" aria-labelledby="nav-tab2">
+
+        <br>
+        <div class="row">
+          <div class="col-12">
+            <select id="input-marca2" class="form-control"
+              name="marca2" [(ngModel)]="marca_id2" (change)="changeMarca2($event.target.value)">
+              <option *ngFor="let marca of listado" [value]="marca.id">{{marca.nombre}}</option>
+            </select>
+          </div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12" style="display:block; margin:auto">
+            <nb-card>
+              <nb-card-body>
+                <div *ngIf="imgPostBase642" id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+                  <div class="carousel-inner">
+                    <div class="carousel-item active">
+                      <img class="d-block w-100" src="{{imgPostBase642}}" alt="Slide">
+                    </div>
+                  </div>
+                  <a class="carousel-control-prev" role="button" data-slide="prev" ngClass="{'carousel-control-prev':true}" (click)="imagenAnterior2()" >
+                    <span>
+                      <i style="font-size: 40px; 
+                        color: grey;" 
+                        class="fa fa-chevron-left" aria-hidden="true"></i>
+                    </span>
+                  </a>
+                  <a class="carousel-control-next" role="button" data-slide="next" ngClass="{'carousel-control-next':true}" (click)="imagenSiguiente2()">
+                    <span>
+                      <i style="font-size: 40px; 
+                        color: grey;"
+                        class="fa fa-chevron-right" aria-hidden="true"></i>
+                    </span>
+                  </a>
+                </div>
+              </nb-card-body>
+              <nb-card-footer>
+                <div class="text-right">
+                  <button type="button" class="btn btn-tn btn-primary" (click)="open(modalAprobar)">
+                    Aprobar marco
+                  </button>
+                </div>
+              </nb-card-footer>
+            </nb-card>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12">
+            <nb-card>
+              <nb-card-body style="padding: 4px;">
+
+                <hr class="my-2" />
+                <h6 class="heading-small text-muted mb-4">Primer texto</h6>
+                <div>
+                  <div class="row row_0">
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <input type="text" id="input-text1" class="form-control" placeholder="Texto" [(ngModel)]="base.marca.nombre" name="text1" >
+                      </div>
+                    </div>
+                    <div class="col-3 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-text1_x" class="form-control" placeholder="X" [(ngModel)]="base.marco.text1_x" name="text1_x" >
+                      </div>
+                    </div>
+                    <div class="col-3 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-text1_y" class="form-control" placeholder="Y" [(ngModel)]="base.marco.text1_y" name="text1_y" >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row row_0">
+                    <div class="col-9 col_0">
+                      <div class="form-group">
+                        <select id="input-text1_font" class="form-control"
+                          name="text1_font" [(ngModel)]="base.marco.text1_font">
+                          <option *ngFor="let fuente of nombres_fuentes" [value]="fuente">{{fuente}}</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-3 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-text1_px" class="form-control" placeholder="px" [(ngModel)]="base.marco.text1_px" name="text1_px" >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row row_0">
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <select id="input-text1_color" class="form-control"
+                          name="text1_color" [(ngModel)]="base.marco.text1_color">
+                          <option *ngFor="let color of colores" [value]="color">{{color}}</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <select id="input-text1_aling" class="form-control"
+                          name="text1_aling" [(ngModel)]="base.marco.text1_aling">
+                          <option *ngFor="let aling of alings" [value]="aling">{{aling}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <hr class="my-2" />
+                <h6 class="heading-small text-muted mb-4">Segundo texto</h6>
+                <div>
+                  <div class="row row_0">
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <input type="text" id="input-text2" class="form-control" placeholder="Texto" [(ngModel)]="base.marca.redes[0].text_page_name" name="text2" >
+                      </div>
+                    </div>
+                    <div class="col-3 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-text2_x" class="form-control" placeholder="X" [(ngModel)]="base.marco.text2_x" name="text2_x" >
+                      </div>
+                    </div>
+                    <div class="col-3 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-text2_y" class="form-control" placeholder="Y" [(ngModel)]="base.marco.text2_y" name="text2_y" >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row row_0">
+                    <div class="col-9 col_0">
+                      <div class="form-group">
+                        <select id="input-text2_font" class="form-control"
+                          name="text2_font" [(ngModel)]="base.marco.text2_font">
+                          <option *ngFor="let fuente of nombres_fuentes" [value]="fuente">{{fuente}}</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-3 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-text2_px" class="form-control" placeholder="px" [(ngModel)]="base.marco.text2_px" name="text2_px" >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row row_0">
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <select id="input-text2_color" class="form-control"
+                          name="text2_color" [(ngModel)]="base.marco.text2_color">
+                          <option *ngFor="let color of colores" [value]="color">{{color}}</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <select id="input-text2_aling" class="form-control"
+                          name="text2_aling" [(ngModel)]="base.marco.text2_aling">
+                          <option *ngFor="let aling of alings" [value]="aling">{{aling}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <hr class="my-2" />
+                <h6 class="heading-small text-muted mb-4">Tercer texto</h6>
+                <div>
+                  <div class="row row_0">
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <input type="text" id="input-text3" class="form-control" placeholder="Texto" [(ngModel)]="base.marca.user.text_telefono" name="text3" >
+                      </div>
+                    </div>
+                    <div class="col-3 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-text3_x" class="form-control" placeholder="X" [(ngModel)]="base.marco.text3_x" name="text3_x" >
+                      </div>
+                    </div>
+                    <div class="col-3 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-text3_y" class="form-control" placeholder="Y" [(ngModel)]="base.marco.text3_y" name="text3_y" >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row row_0">
+                    <div class="col-9 col_0">
+                      <div class="form-group">
+                        <select id="input-text3_font" class="form-control"
+                          name="text3_font" [(ngModel)]="base.marco.text3_font">
+                          <option *ngFor="let fuente of nombres_fuentes" [value]="fuente">{{fuente}}</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-3 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-text3_px" class="form-control" placeholder="px" [(ngModel)]="base.marco.text3_px" name="text3_px" >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row row_0">
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <select id="input-text3_color" class="form-control"
+                          name="text3_color" [(ngModel)]="base.marco.text3_color">
+                          <option *ngFor="let color of colores" [value]="color">{{color}}</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <select id="input-text3_aling" class="form-control"
+                          name="text3_aling" [(ngModel)]="base.marco.text3_aling">
+                          <option *ngFor="let aling of alings" [value]="aling">{{aling}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <hr class="my-2" />
+                <h6 class="heading-small text-muted mb-4">Colores</h6>
+                <div>
+                  <div class="row row_0">
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <input style="cursor: pointer; height: 50px;" type="color" id="input-color_aa" class="form-control" [(ngModel)]="base.marca.color_a" (ngModelChange)="modelChangedA($event)" name="color_aa">
+                      </div>
+                    </div>
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <input type="text" id="input-color_a" class="form-control" placeholder="Hexadecimal" [(ngModel)]="base.marca.color_a" disabled="true">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row row_0">
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <input style="cursor: pointer; height: 50px;" type="color" id="input-color_bb" class="form-control" [(ngModel)]="base.marca.color_b" (ngModelChange)="modelChangedB($event)">
+                      </div>
+                    </div>
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <input type="text" id="input-color_b" class="form-control" placeholder="Hexadecimal" [(ngModel)]="base.marca.color_b" disabled="true">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row row_0">
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <input style="cursor: pointer; height: 50px;" type="color" id="input-color_cc" class="form-control" [(ngModel)]="base.marca.color_c" (ngModelChange)="modelChangedC($event)">
+                      </div>
+                    </div>
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <input type="text" id="input-color_c" class="form-control" placeholder="Hexadecimal" [(ngModel)]="base.marca.color_c" disabled="true">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <hr class="my-2" />
+                <h6 class="heading-small text-muted mb-4">Primera imagen</h6>
+                <div>
+                  <div class="row row_0">
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-img1_x" class="form-control" placeholder="X" [(ngModel)]="base.marco.img1_x" name="img1_x" >
+                      </div>
+                    </div>
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-img1_y" class="form-control" placeholder="Y" [(ngModel)]="base.marco.img1_y" name="img1_y" >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row row_0">
+                    <div class="col-4 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-img1_radius" class="form-control" placeholder="Radius" [(ngModel)]="base.marco.img1_radius" name="img1_radius" >
+                      </div>
+                    </div>
+                    <div class="col-4 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-img1_width" class="form-control" placeholder="Width" [(ngModel)]="base.marco.img1_width" name="img1_width" >
+                      </div>
+                    </div>
+                    <div class="col-4 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-img1_height" class="form-control" placeholder="Height" [(ngModel)]="base.marco.img1_height" name="img1_height" >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <hr class="my-2" />
+                <h6 class="heading-small text-muted mb-4">Segunda imagen</h6>
+                <div>
+                  <div class="row row_0">
+                    <div class="col-9 col_0">
+                      <div class="form-group">
+                        <input type="text" id="input-pexels_frase" class="form-control" placeholder="Palabra clave" [(ngModel)]="base.marca.pexels_frase" name="pexels_frase" >
+                      </div>
+                    </div>
+                    <div class="col-3 col_0">
+                      <div class="form-group">
+                        <button style="margin-top: 6px;" type="button" class="btn btn-icon btn-tn btn-primary" title="Refresh" (click)="getImgPexels(base.marca.pexels_frase)" [disabled]="false"> <i class="fa fa-refresh icon-refresh"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row row_0">
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <input type="file" name="imagen" id="imagen2" (change)="onFileChangeImg2($event)" #fileInput accept="image/*">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row row_0">
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-img2_x" class="form-control" placeholder="X" [(ngModel)]="base.marco.img2_x" name="img2_x" >
+                      </div>
+                    </div>
+                    <div class="col-6 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-img2_y" class="form-control" placeholder="Y" [(ngModel)]="base.marco.img2_y" name="img2_y" >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row row_0">
+                    <div class="col-4 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-img2_radius" class="form-control" placeholder="Radius" [(ngModel)]="base.marco.img2_radius" name="img2_radius" >
+                      </div>
+                    </div>
+                    <div class="col-4 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-img2_width" class="form-control" placeholder="Width" [(ngModel)]="base.marco.img2_width" name="img2_width" >
+                      </div>
+                    </div>
+                    <div class="col-4 col_0">
+                      <div class="form-group">
+                        <input type="number" id="input-img2_height" class="form-control" placeholder="Height" [(ngModel)]="base.marco.img2_height" name="img2_height" >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </nb-card-body>
+              <nb-card-footer>
+                <div class="text-right">
+                  <button type="button" class="btn btn-tn btn-primary" (click)="aplicarCambios()">
+                    Aplicar cambios
+                  </button>
+                </div>
+              </nb-card-footer>
+            </nb-card>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="miDiv" #divCapturar [hidden]="true">
+  <canvas #canvas></canvas>
+</div>
+
+<ng-template #modalEliminar id="modalEliminar" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Eliminar marco: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <p>
+      <strong>¿Realmente desea eliminar este marco?</strong>
+    </p>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-danger" (click)="c('Close click');eliminarMarco()">Aceptar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalNuevo let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Nuevo: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <div class="row">
+      <div class="col-12">
+        <label for="imagen">Marco (PNG)</label>
+        <input type="file" name="imagen" id="imagen" (change)="capturarFile($event)" #fileInput accept="image/png">
+      </div>        
+      <br><br>
+      <div class="col-12">
+        <img *ngIf="previsualizacion" src="{{previsualizacion}}" alt="" width="200" height="200">
+      </div>
+    </div>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="c('Close click');subirArchivo()">Aceptar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalAprobar id="modalAprobar" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Aprobar marco: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <p>
+      <strong>¿Realmente desea aprobar este marco?</strong>
+    </p>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-danger" (click)="c('Close click');aprobarMarco()">Aceptar</button>
+  </div>
+</ng-template>
+
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

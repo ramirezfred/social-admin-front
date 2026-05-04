@@ -1,0 +1,695 @@
+<br>
+<div class="row">
+  <div class="col-12" style="text-align: right">
+    <button style="display: inline-block;" type="button" class="btn btn-icon btn-tn btn-primary" title="Refresh" (click)="refreshTabla()"> <i class="fa fa-refresh icon-refresh"></i>
+    </button>
+  </div>
+</div>
+<br>
+<div class="row">
+  <div class="col-12" style="text-align: right">
+    <button style="display: inline-block;" type="button" class="btn btn-tn btn-primary" title="Crear usuario" (click)="aCrear()">
+      Crear usuario
+    </button>
+  </div>
+</div>
+<br>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">    
+      <div class="input-group">
+        <input placeholder="Buscar..." class="form-control" type="text" id="inputTermino2" [(ngModel)]="inputTermino" (ngModelChange)="FilterByTermino()"/> 
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+
+<div class="row">
+  <div class="col-12"> 
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th >ID</th>
+            <th >Fecha de alta</th>
+            <th >Email</th>
+            <th >Teléfono</th>
+            <th >Marcas</th>
+            <th >Servicios</th>
+            <th >Status</th>
+            <th >Acciones</th>
+          </tr>
+        </thead>  
+        <tbody>
+          <tr *ngFor="let item of items; let i = index" >
+              
+            <td >{{item.id}}</td>
+            <td >{{item.created_at}}</td>
+            <td >{{item.email}}</td>
+            <td >
+              {{item.telefono}}&nbsp;
+              <a href="https://wa.me/521{{item.telefono}}" target="_blank">
+                <i class="fa fa-whatsapp whatsapp-icon"></i>
+              </a>
+            </td>
+            <td >
+              <div *ngFor="let marca of item.marcas; let j = index">
+                <strong [ngStyle]="{'color': marca.status==1 ? 'green' : '' }">
+                  {{marca.nombre}}
+                </strong>
+                <div>
+                  <i class="ion-edit" style="cursor:pointer;" (click)="aEditarMarca(marca, i, j)"></i>
+                  &nbsp;&nbsp;&nbsp;
+                  <i class="fa fa-calendar" style="cursor:pointer;" (click)="open2(modalHorario);aEditarHorario(marca, i, j)"></i>
+                </div>
+                <div style="margin-top: 10px;">
+                  <i class="fa fa-credit-card-alt" style="cursor:pointer;" (click)="encryptId(1, item.email, item.telefono, marca.nombre, marca.id)"></i>
+                  &nbsp;&nbsp;&nbsp;
+                  <i class="fa fa-cubes" style="cursor:pointer;" (click)="encryptId(2, item.email, item.telefono, marca.nombre, marca.id)"></i> 
+                </div>
+                <div class="row">
+                  <div class="col-4" *ngFor="let red of marca.redes; let k = index">
+                    <i *ngIf="red.tipo == 1" class="fa fa-facebook-square" style="cursor:pointer;" (click)="verRed(red)"></i>
+                    <i *ngIf="red.tipo == 2" class="fa fa-instagram" style="cursor:pointer;" (click)="verRed(red)"></i>
+                  </div>
+                </div>
+                <div style="margin-top: 10px;">
+                  <i class="fa fa-trash-o" style="cursor:pointer;" (click)="open(modalEliminarMarca);aEliminarMarca(marca, i, j)"></i> 
+                  &nbsp;&nbsp;&nbsp;
+                  <i class="fa fa-money" style="cursor:pointer;" (click)="open(modalCobro);aCobrarMarca(marca, i, j)"></i> 
+                </div>
+              </div>
+            </td>
+            <td >
+              <div *ngFor="let marca of item.marcas">
+                <strong>{{marca.nombre}}</strong>:
+                <div *ngFor="let servicio of marca.servicios">
+                  &nbsp;&nbsp;- {{servicio}}
+                </div>
+              </div>
+            </td>
+            <td >
+              <nb-checkbox [(ngModel)]="item.status" (change) = "ChangeStatus(item)" style="cursor:pointer;">
+                <div *ngIf="!item.status">OFF</div>
+                <div *ngIf="item.status">ON</div>
+              </nb-checkbox>
+            </td>
+            <td >
+              <button style="margin-top: 4px;" type="button" class="btn btn-tn btn-primary" title="Editar Usuario" (click)="aEditar(item, i)">Editar Usuario</button>
+              <button style="margin-top: 4px;" type="button" class="btn btn-tn btn-primary" title="Eliminar Usuario" (click)="open(modalEliminarUser);aEliminarUser(item, i)">Eliminar Usuario</button>
+              <button style="margin-top: 4px;" type="button" class="btn btn-tn btn-primary" title="Crear marca" (click)="aCrearMarca(item, i)">Crear marca</button>
+              <button style="margin-top: 4px;" type="button" class="btn btn-tn btn-primary" title="Personalizar marcas" (click)="open(modalPersMarcas);aPersonalizarMarcas(item, i)">Personalizar marcas</button>
+              <button style="margin-top: 4px;" type="button" class="btn btn-tn btn-primary" title="Generar textos" (click)="open(modalTextosUser);agenerarTextosUser(item, i)">Generar textos</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<br>
+<div class="row">
+  <div class="col-12"> 
+    <div class="btn-toolbar" role="toolbar" style="margin: 0;">
+      <div class="btn-group">
+         <label style="margin-top:10px">Página {{currentIndex}}/{{pageNumber}} </label>
+      </div>
+      <div class="btn-group pull-right">
+         <ul class="pagination" >
+            <li class="page-item" [ngClass]="{'disabled': (currentIndex == 1 || pageNumber == 0)}" ><a class="page-link"  (click)="prevPage()" >Atrás</a></li>
+            <li class="page-item" *ngFor="let page of pagesIndex"  [ngClass]="{'active': (currentIndex == page)}">
+              <a class="page-link" (click)="setPage(page)"  >{{page}} </a>
+            </li>
+            <li class="page-item" [ngClass]="{'disabled': (currentIndex == pageNumber || pageNumber == 0)}" ><a class="page-link"   (click)="nextPage()" >Siguiente</a></li>
+         </ul>
+      </div>
+    </div> 
+  </div>
+</div>
+
+<ng-template #modalUser let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Usuario: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="myForm" autocomplete="nope">
+      <div class="row">
+        <div class="col-12 form-group">
+          <label for="input-email">Email</label>
+          <input name="email" formControlName="email" id="input-email" pattern=".+@.+..+" class="form-control" placeholder="Email" [class.control-invalid]="emailNoValido">
+          <small *ngIf="emailNoValido" style="color: #dc3545 !important;">
+            Requerido
+          </small>
+        </div>
+        <div class="col-12 form-group">
+          <label for="input-telefono">Teléfono</label>
+          <input name="telefono" formControlName="telefono" id="input-telefono" class="form-control" placeholder="Teléfono" [class.control-invalid]="telefonoNoValido">
+          <small *ngIf="telefonoNoValido" style="color: #dc3545 !important;">
+            Requerido (10 dígitos)
+          </small>
+        </div>
+        <div class="col-12 form-group">
+          <label for="input-password">Password</label>
+          <input name="password" formControlName="password" type="password" id="input-password" class="form-control" placeholder="Password" [class.control-invalid]="passwordNoValido"> 
+          <small *ngIf="passwordNoValido" style="color: #dc3545 !important;">
+            Requerido
+          </small>
+        </div>
+        <div class="col-12 form-group">
+          <label for="input-password2">Repetir password</label>
+          <input name="password2" formControlName="password2" type="password" id="input-password2" class="form-control" placeholder="Repetir password" [class.control-invalid]="password2NoValido"> 
+          <small *ngIf="password2NoValido" style="color: #dc3545 !important;">
+            Requerido
+          </small>
+        </div>
+        <div [hidden]="accion" class="col-12 form-group">
+          <label for="input-marca">Marca</label>
+          <input name="marca" formControlName="marca" type="text" id="input-marca" class="form-control" placeholder="Marca" [class.control-invalid]="marcaNoValido"> 
+          <small *ngIf="marcaNoValido" style="color: #dc3545 !important;">
+            Requerido
+          </small>
+        </div>
+        <div [hidden]="accion" class="col-12">
+          <label for="imagen">Logo (PNG)</label>
+          <input type="file" name="imagen" id="imagen" (change)="capturarFile($event)" #fileInput accept="image/png">
+        </div>        
+        <br>
+        <div [hidden]="accion" class="col-12">
+          <img *ngIf="previsualizacion" src="{{previsualizacion}}" alt="" width="200" height="200">
+        </div>
+      </div>
+    </form>
+    <br [hidden]="accion">
+    <div [hidden]="accion" class="row">
+      <div class="col-9">
+        <label for="input-servicio">Servicio(s)</label>
+        <input type="text" placeholder="Ejemplo: Venta de comida" class="form-control" [(ngModel)]="service_description" maxlength="250" />
+      </div>
+      <div class="col-3">
+        <button style="margin-top: 30px" type="button" class="btn btn-outline-success" (click)="newService()" title="Agregar">+</button>
+      </div>
+    </div>
+    <br [hidden]="accion">
+    <div [hidden]="accion" class="row">
+      <div class="col-12">
+        <table class="table table-bordered table-sm">
+          <thead>
+            <tr>
+              <th>Servicio</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of servicios; index as i">
+              <td style="vertical-align:middle;">{{item}}</td>
+              <td style="text-align: center; vertical-align:middle;">
+                <button style="display: inline-block;" type="button" class="btn btn-sm btn-outline-danger btn-icon btn-table" (click)="removeServiceForm(i)" title="Eliminar"><i class="nb-trash"></i></button>
+              </td>
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')" #btnAtras id="btnAtras">Atrás</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="guardar()">Aceptar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalMarca let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Marca: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+
+    <div class="row">
+      <div *ngIf="accionMarca == 1" class="col-12 form-group">
+        <label for="input-marca">Status</label>&nbsp;&nbsp;
+        <nb-checkbox [(ngModel)]="selectObj.status" (change) = "ChangeStatusMarca()" style="cursor:pointer;">
+          <div *ngIf="!selectObj.status">OFF</div>
+          <div *ngIf="selectObj.status">ON</div>
+        </nb-checkbox> 
+      </div>
+      <br>
+    </div>
+
+    <form [formGroup]="myFormMarca" autocomplete="nope">
+      <div class="row">
+        <div class="col-12 form-group">
+          <label for="input-marca">Marca</label>
+          <input name="marca" formControlName="nombre" type="text" id="input-marca" class="form-control" placeholder="Marca" [class.control-invalid]="nombreNoValido"> 
+          <small *ngIf="nombreNoValido" style="color: #dc3545 !important;">
+            Requerido
+          </small>
+        </div>
+        <div class="col-12">
+          <label for="imagen">Logo (PNG)</label>
+          <input type="file" name="imagen" id="imagen" (change)="capturarFile($event)" #fileInput accept="image/png">
+        </div>        
+        <br>
+        <div class="col-12">
+          <img *ngIf="previsualizacion" src="{{previsualizacion}}" alt="" width="200" height="200">
+        </div>
+      </div>
+    </form>
+    <br>
+    <div class="row">
+      <div class="col-9">
+        <label for="input-servicio">Servicio(s)</label>
+        <input type="text" placeholder="Ejemplo: Venta de comida" class="form-control" [(ngModel)]="service_description" maxlength="250" />
+      </div>
+      <div class="col-3">
+        <button style="margin-top: 30px" type="button" class="btn btn-outline-success" (click)="newService()" title="Agregar">+</button>
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <div class="col-12">
+        <table class="table table-bordered table-sm">
+          <thead>
+            <tr>
+              <th>Servicio</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of servicios; index as i">
+              <td style="vertical-align:middle;">{{item}}</td>
+              <td style="text-align: center; vertical-align:middle;">
+                <button style="display: inline-block;" type="button" class="btn btn-sm btn-outline-danger btn-icon btn-table" (click)="removeServiceForm(i)" title="Eliminar"><i class="nb-trash"></i></button>
+              </td>
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')" #btnAtras2 id="btnAtras2">Atrás</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="guardarMarca()">Aceptar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalEliminarUser id="modalEliminarUser" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Eliminar usuario: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <p>
+      <strong>¿Realmente desea eliminar este usuario?</strong>
+    </p>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="c('Close click');eliminarUser()">Aceptar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalEliminarMarca id="modalEliminarMarca" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Eliminar marca: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <p>
+      <strong>¿Realmente desea eliminar esta marca?</strong>
+    </p>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="c('Close click');eliminarMarca()">Aceptar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalHorario id="modalHorario" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Horario: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <div class="container">
+    <h6 class="heading-small text-muted mb-4">Selecciona uno o varios días y hora para los Posts</h6>
+
+    <div class="row">
+      <div class="col">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" [(ngModel)]="allDias" name="allDias" autocomplete="off" (click)="toggleDaysSelection()">
+          <label class="form-check-label" for="allDias">Seleccionar todos los dias</label>
+        </div>
+      </div>
+    </div>
+    <br>
+
+    <div class="row">
+      <div class="col-md-6" *ngFor="let dia of marca_horario">
+        <div class="card">
+          <div class="card-header">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" [(ngModel)]="dia.sel" name="dias" [value]="dia.nombre" autocomplete="off">
+              <label class="form-check-label" for="dias">{{ dia.nombre }}</label>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="hora">Hora:</label>
+                  <select class="form-control" [(ngModel)]="dia.hora" name="hora">
+                    <option *ngFor="let hora of horas" [value]="hora">{{ hora }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="minutos">Minutos:</label>
+                  <select class="form-control" [(ngModel)]="dia.minutos" name="minutos">
+                    <option *ngFor="let minuto of minutos" [value]="minuto">{{ minuto }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="c('Close click');editarHorario()">Actualizar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalPersMarcas let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Personalizar Marca: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+
+    <div class="form-group">
+      <label class="form-control-label" for="input-marca">Seleccione una marca</label>
+      <select id="input-marca" class="form-control"
+        name="marca" [(ngModel)]="personalizar_id" (change)="changePersonalizar($event.target.value)">
+        <option *ngFor="let marca of marcas" [value]="marca.id">{{marca.nombre}}</option>
+      </select>
+    </div>
+
+    <br>
+    <nav>
+      <div class="nav nav-tabs" id="nav-tabApi" role="tablist">
+        <a [ngClass]="{'nav-item nav-link active': selectedTabApi1, 'nav-item nav-link': !selectedTabApi1}" style="cursor: pointer;" id="nav-tabApi1" data-toggle="tab" role="tab" aria-controls="nav-1" aria-selected="true" (click)="selectTabApi(0)">ChatGPT</a>
+        <a [ngClass]="{'nav-item nav-link active': selectedTabApi2, 'nav-item nav-link': !selectedTabApi2}" style="cursor: pointer;" id="nav-tabApi2" data-toggle="tab" role="tab" aria-controls="nav-2" aria-selected="true" (click)="selectTabApi(1)">Imagenes</a>
+        <a [ngClass]="{'nav-item nav-link active': selectedTabApi3, 'nav-item nav-link': !selectedTabApi3}" style="cursor: pointer;" id="nav-tabApi3" data-toggle="tab" role="tab" aria-controls="nav-3" aria-selected="true" (click)="selectTabApi(2)">Comentarios</a>
+        <a [ngClass]="{'nav-item nav-link active': selectedTabApi4, 'nav-item nav-link': !selectedTabApi4}" style="cursor: pointer;" id="nav-tabApi4" data-toggle="tab" role="tab" aria-controls="nav-4" aria-selected="true" (click)="selectTabApi(3)">Textos</a>
+      </div>
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+      <div [ngClass]="{'tab-pane fade show active': selectedTabApi1, 'tab-pane fade': !selectedTabApi1}" id="nav-1" role="tabpanel" aria-labelledby="nav-tabApi1">
+
+        <br>
+        <div class="row">           
+          <div class="demo-radio col-12">
+            <label class="custom-control custom-radio">
+              <input type="radio" class="custom-control-input" name="option" [(ngModel)]="bandera_flujo" value="0" (ngModelChange)="onOptionSelected()">
+              <span class="custom-control-indicator"></span>
+              <span class="custom-control-description">Usar flujo A</span>
+            </label>
+            <label class="custom-control custom-radio">
+              <input type="radio" class="custom-control-input" name="option" [(ngModel)]="bandera_flujo" value="1" (ngModelChange)="onOptionSelected()">
+              <span class="custom-control-indicator"></span>
+              <span class="custom-control-description">Usar flujo B</span>
+            </label>
+          </div>
+        </div>
+
+        <br>
+        <nav>
+          <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a [ngClass]="{'nav-item nav-link active': selectedTab1, 'nav-item nav-link': !selectedTab1}" style="cursor: pointer;" id="nav-tab1" data-toggle="tab" role="tab" aria-controls="nav-1" aria-selected="true" (click)="selectTab(0)">Flujo A</a>
+            <a [ngClass]="{'nav-item nav-link active': selectedTab2, 'nav-item nav-link': !selectedTab2}" style="cursor: pointer;" id="nav-tab2" data-toggle="tab" role="tab" aria-controls="nav-2" aria-selected="true" (click)="selectTab(1)">Flujo B</a>
+          </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+          <div [ngClass]="{'tab-pane fade show active': selectedTab1, 'tab-pane fade': !selectedTab1}" id="nav-1" role="tabpanel" aria-labelledby="nav-tab1">
+        
+            <hr>
+            <strong>Configuración ChatGPT</strong>
+            <br><br>
+
+            <div class="row">
+              <div class="col-9">
+                <label for="input-parametro">Parametro</label>
+                <input type="text" placeholder="Ejemplo: Sin personas" class="form-control" [(ngModel)]="parametro" maxlength="250" />
+              </div>
+              <div class="col-3">
+                <button style="margin-top: 30px" type="button" class="btn btn-outline-success" (click)="newParametro()" title="Agregar">+</button>
+              </div>
+            </div>
+            <br>
+            <div class="row">
+              <div class="col-12">
+                <table class="table table-bordered table-sm">
+                  <thead>
+                    <tr>
+                      <th>Parámetro(s) para la escena</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of parametros; index as i">
+                      <td style="vertical-align:middle;">{{item}}</td>
+                      <td style="text-align: center; vertical-align:middle;">
+                        <button style="display: inline-block;" type="button" class="btn btn-sm btn-outline-danger btn-icon btn-table" (click)="removeParametro(i)" title="Eliminar"><i class="nb-trash"></i></button>
+                      </td>
+                    </tr>
+                    
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <hr>
+            <strong>Configuración Dalle</strong>
+            <br><br>
+
+            <div class="row">
+              <div class="col-9">
+                <label for="input-parametro2">Parametro</label>
+                <input type="text" placeholder="Ejemplo: Estilo anime" class="form-control" [(ngModel)]="parametro2" maxlength="250" />
+              </div>
+              <div class="col-3">
+                <button style="margin-top: 30px" type="button" class="btn btn-outline-success" (click)="newParametroImagen()" title="Agregar">+</button>
+              </div>
+            </div>
+            <br>
+            <div class="row">
+              <div class="col-12">
+                <table class="table table-bordered table-sm">
+                  <thead>
+                    <tr>
+                      <th>Parámetro(s) para la imagen</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of parametros_imagen; index as i">
+                      <td style="vertical-align:middle;">{{item}}</td>
+                      <td style="text-align: center; vertical-align:middle;">
+                        <button style="display: inline-block;" type="button" class="btn btn-sm btn-outline-danger btn-icon btn-table" (click)="removeParametroImagen(i)" title="Eliminar"><i class="nb-trash"></i></button>
+                      </td>
+                    </tr>
+                    
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+          <div [ngClass]="{'tab-pane fade show active': selectedTab2, 'tab-pane fade': !selectedTab2}" id="nav-2" role="tabpanel" aria-labelledby="nav-tab2">
+            
+            <br>
+            <div class="form-group row">
+              <div class="col-12">
+                <label for="input-prompt_imagen">Prompt para Dall-E</label>
+                <textarea id="textarea-input" name="textarea-input" rows="9" class="form-control" placeholder="Prompt para Dall-E" [(ngModel)]="prompt_imagen" maxlength="1000"></textarea>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+      <div [ngClass]="{'tab-pane fade show active': selectedTabApi2, 'tab-pane fade': !selectedTabApi2}" id="nav-2" role="tabpanel" aria-labelledby="nav-tabApi2">
+
+        <br>
+        <div class="row">
+          <div class="col-12 form-group">
+            <label for="input-palabra">Status Palabra/Frase clave</label>&nbsp;&nbsp;
+            <nb-checkbox [(ngModel)]="pexels_status" (change) = "ChangeStatusPexels()" style="cursor:pointer;">
+              <div *ngIf="!pexels_status">OFF</div>
+              <div *ngIf="pexels_status">ON</div>
+            </nb-checkbox> 
+          </div>
+          <br>
+        </div>
+        <div class="row">
+          <div class="col-12 form-group">
+            <label for="input-frase">Palabra/Frase clave</label>
+            <input type="text" placeholder="Palabra/Frase clave" class="form-control" [(ngModel)]="pexels_frase" maxlength="250" (blur)="onBlurPexels()"/>
+            <span *ngIf="pexels_total_results">Resultados: {{pexels_total_results}}</span>
+          </div>
+        </div>
+      </div>
+      <div [ngClass]="{'tab-pane fade show active': selectedTabApi3, 'tab-pane fade': !selectedTabApi3}" id="nav-3" role="tabpanel" aria-labelledby="nav-tabApi3">
+
+        <!-- <br>
+        <div class="row">
+          <div class="col-12 form-group">
+            <label for="input-palabra">Status Comentarios</label>&nbsp;&nbsp;
+            <nb-checkbox [(ngModel)]="comment_status" (change) = "ChangeStatusComments()" style="cursor:pointer;">
+              <div *ngIf="!comment_status">OFF</div>
+              <div *ngIf="comment_status">ON</div>
+            </nb-checkbox> 
+          </div>
+          <br>
+        </div> -->
+
+        <br>
+        <div class="row">           
+          <div class="demo-radio col-12">
+            <label class="custom-control custom-radio">
+              <input type="radio" class="custom-control-input" name="option_comment" [(ngModel)]="comment_status" value="0" (ngModelChange)="onOptionCommentsSelected()">
+              <span class="custom-control-indicator"></span>
+              <span class="custom-control-description">No responder</span>
+            </label>
+            <label class="custom-control custom-radio">
+              <input type="radio" class="custom-control-input" name="option_comment" [(ngModel)]="comment_status" value="1" (ngModelChange)="onOptionCommentsSelected()">
+              <span class="custom-control-indicator"></span>
+              <span class="custom-control-description">Respuesta con ChatGPT</span>
+            </label>
+            <label class="custom-control custom-radio">
+              <input type="radio" class="custom-control-input" name="option_comment" [(ngModel)]="comment_status" value="2" (ngModelChange)="onOptionCommentsSelected()">
+              <span class="custom-control-indicator"></span>
+              <span class="custom-control-description">Respuesta predefinida</span>
+            </label>
+          </div>
+        </div>
+
+        <br>
+        <div class="row">
+
+          <div class="col-12 form-group">
+            <label for="comment_prompt">Prompt</label>
+            <textarea id="comment_prompt" name="comment_prompt" rows="5" class="form-control" placeholder="Prompt" [(ngModel)]="comment_prompt"></textarea>
+          </div>
+
+          <div class="col-12 form-group">
+            <label for="comment_auto">Respuesta predefinida</label>
+            <textarea id="comment_auto" name="comment_auto" rows="5" class="form-control" placeholder="Respuesta" [(ngModel)]="comment_auto"></textarea>
+          </div>
+
+          <div class="col-12 form-group">
+            <label for="comment_footer">Footer</label>
+            <textarea id="comment_footer" name="comment_footer" rows="5" class="form-control" placeholder="Footer" [(ngModel)]="comment_footer"></textarea>
+          </div>
+
+        </div>
+      </div>
+      <div [ngClass]="{'tab-pane fade show active': selectedTabApi4, 'tab-pane fade': !selectedTabApi4}" id="nav-4" role="tabpanel" aria-labelledby="nav-tabApi4">
+
+        <br>
+        <div class="row">
+
+          <div class="col-12 form-group">
+            <label for="prompt_textos">Prompt</label>
+            <textarea id="prompt_textos" name="prompt_textos" rows="5" class="form-control" placeholder="Prompt" [(ngModel)]="prompt_textos"></textarea>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')" #btnAtras3 id="btnAtras3">Atrás</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="personalizarMarca()">Aceptar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalTextosUser id="modalTextosUser" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Generar textos: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <p>
+      <strong>¿Generar textos para este usuario?</strong>
+    </p>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="c('Close click');generarTextosUser()">Aceptar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalCobro id="modalCobro" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Cobro automático: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <p>
+      <strong>¿Realmente desea ejecutar el cobro automático a esta marca?</strong>
+    </p>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="c('Close click');cobrarMarca()">Aceptar</button>
+  </div>
+</ng-template>
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

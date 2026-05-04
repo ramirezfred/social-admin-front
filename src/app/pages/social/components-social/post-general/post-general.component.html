@@ -1,0 +1,82 @@
+<br>
+<!-- <div class="row" [hidden]="false">
+  <div class="col-12" style="text-align: right">
+    <button style="display: inline-block;" type="button" class="btn btn-icon btn-tn btn-primary" title="Refresh" (click)="refreshTabla()" [disabled]="false"> <i class="fa fa-refresh icon-refresh"></i>
+    </button>
+  </div>
+</div> -->
+
+
+<div class="row">
+  <div class="col-xl-5 col-lg-6 col-md-6 col-sm-9" style="display:block; margin:auto">
+    <nb-card>
+      <nb-card-body>
+        <div *ngIf="imgPostBase64" id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img class="d-block w-100" src="{{imgPostBase64}}" alt="Slide">
+            </div>
+          </div>
+        </div>
+        <br>
+        <p>
+          {{texto}}
+        </p>
+
+        <div id="miDiv" #divCapturar [hidden]="true">
+          <canvas #canvas></canvas>
+        </div>
+
+      </nb-card-body>
+      <nb-card-footer>
+        <div class="text-right">
+          <button type="button" class="btn btn-tn btn-primary" (click)="open(modalNuevo);clearImage()">
+            Redactar
+          </button>
+          <button type="button" class="btn btn-tn btn-primary" (click)="consultarMarcas()" [disabled]="imgPostBase64 === null || texto === '' || generado">
+            Postear
+          </button>
+        </div>
+      </nb-card-footer>
+    </nb-card>
+  </div>
+</div>
+
+<ng-template #modalNuevo let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Nuevo: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+
+    <div class="form-group">
+      <textarea id="texto" name="texto" rows="5" class="form-control" placeholder="Post" [(ngModel)]="texto"></textarea>
+    </div>
+    <br>
+    
+    <div class="row">
+      <div class="col-12">
+        <label for="imagen">Imagen (JPG)</label>
+        <input type="file" name="imagen" id="imagen" (change)="capturarFile($event)" #fileInput accept="image/jpeg">
+      </div>        
+      <br><br>
+      <div class="col-12">
+        <img *ngIf="previsualizacion" src="{{previsualizacion}}" alt="" width="200" height="200">
+      </div>
+    </div>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="c('Close click')">Aceptar</button>
+  </div>
+</ng-template>
+
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

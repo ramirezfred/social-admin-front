@@ -1,0 +1,72 @@
+<div class="row">
+  <div class="col-12">
+  
+    <nb-card>
+      <nb-card-header>Cotizaciones</nb-card-header>
+      <nb-card-body>
+
+        <br>
+        <nav>
+          <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a [ngClass]="{'nav-item nav-link active': selectedTab1, 'nav-item nav-link': !selectedTab1}" 
+                style="cursor: pointer;" id="nav-tab1" data-toggle="tab" 
+                role="tab" aria-controls="nav-1" aria-selected="true" 
+                (click)="selectTab(1)">
+              Mis cotizaciones ({{count_p_cotiznes1}})
+            </a>
+            <a [ngClass]="{'nav-item nav-link active': selectedTab2, 'nav-item nav-link': !selectedTab2}" 
+                style="cursor: pointer;" id="nav-tab2" data-toggle="tab" 
+                role="tab" aria-controls="nav-2" aria-selected="true" 
+                (click)="selectTab(2)">
+              Proveedores
+            </a>
+            <a [ngClass]="{'nav-item nav-link active': selectedTab3, 'nav-item nav-link': !selectedTab3}" 
+                style="cursor: pointer;" id="nav-tab3" data-toggle="tab" 
+                role="tab" aria-controls="nav-3" aria-selected="true" 
+                (click)="selectTab(3)">
+              Historial
+            </a>
+            <a [ngClass]="{'nav-item nav-link active': selectedTab4, 'nav-item nav-link': !selectedTab4}" 
+                style="cursor: pointer;" id="nav-tab4" data-toggle="tab" 
+                role="tab" aria-controls="nav-4" aria-selected="true" 
+                (click)="selectTab(4)">
+              Reportes
+            </a>
+          </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+          <div [ngClass]="{'tab-pane fade show active': selectedTab1, 'tab-pane fade': !selectedTab1}" 
+            id="nav-1" role="tabpanel" aria-labelledby="nav-tab1">
+            <br>
+            <app-quotes (cont_cotiznes_event)="count_p_cotiznes1 = $event"></app-quotes>
+          </div>
+          <div [ngClass]="{'tab-pane fade show active': selectedTab2, 'tab-pane fade': !selectedTab2}" 
+            id="nav-2" role="tabpanel" aria-labelledby="nav-tab2">
+            <br>
+            <app-suppliers></app-suppliers>
+          </div>
+          <div [ngClass]="{'tab-pane fade show active': selectedTab3, 'tab-pane fade': !selectedTab3}" 
+            id="nav-3" role="tabpanel" aria-labelledby="nav-tab3">
+            <br>
+            <app-history></app-history>
+          </div>
+          <div [ngClass]="{'tab-pane fade show active': selectedTab4, 'tab-pane fade': !selectedTab4}" 
+            id="nav-4" role="tabpanel" aria-labelledby="nav-tab4">
+            <br>
+            <app-reports></app-reports>
+          </div>
+        </div>
+        
+      </nb-card-body>
+    </nb-card>
+
+  </div>
+</div>
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>
+
+

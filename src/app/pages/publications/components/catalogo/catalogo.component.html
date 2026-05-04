@@ -1,0 +1,95 @@
+<div>
+    <br>
+    <form autocomplete="off" [formGroup]="myForm">
+        
+        <div class="form-row"> 
+
+            <div class="col-md-2 offset-md-2 col-sm-12 form-group">
+                <label for="selectedStartDate">Fecha inicial:</label>
+                <input 
+                type="date"
+                class="form-control" 
+                formControlName="fecha_inicio" 
+                id="selectedStartDate" />
+            </div>
+
+            <div class="col-md-2 col-sm-12 form-group">
+                <label for="selectedEndDate">Fecha final:</label>
+                <input 
+                type="date"
+                class="form-control" 
+                formControlName="fecha_fin" 
+                id="selectedEndDate" />
+            </div>
+
+            <div class="col-md-4 col-sm-12">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-control-label" for="input-supplier_razon_social">Proveedor</label>
+                            <input type="text" 
+                            id="input-supplier_razon_social" 
+                            class="form-control" 
+                            placeholder="Buscar proveedor..." 
+                            formControlName="supplier_razon_social" 
+                            (focus)="mostrarAutocompletado()"
+                            (blur)="ocultarAutocompletado()"
+                            (click)="inputSupplier.select()"
+                            #inputSupplier>
+                        </div>
+                    </div>
+                    <div class="col-12" *ngIf="suppliersFiltrados.length > 0 && showDropdown">
+                        <div class="card shadow-sm position-absolute" style="z-index: 1000; width: 95%; margin-top: 2px;">
+                            <ul class="list-group list-group-flush p-0" style="max-height: 200px; overflow-y: auto; margin-bottom: 0;">
+                            <li class="list-group-item disabled py-1 text-muted" style="font-size: 0.85rem;">
+                                -- Selecciona una opción --
+                            </li>
+                            
+                            <li *ngFor="let item of suppliersFiltrados" 
+                                class="list-group-item list-group-item-action py-2"
+                                (mousedown)="seleccionarSupplier(item)" 
+                                style="cursor: pointer;">
+                                <div class="flex-grow-1">
+                                <div class="font-weight-bold text-dark">{{ item.razon_social }}</div>
+                                <small class="text-muted">
+                                    {{ item.categoria || 'Sin Categoría' }}
+                                </small>
+                                </div>
+                            </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-2 offset-md-2 col-sm-12 form-group d-flex align-items-end">
+                <button 
+                class="btn btn-primary btn-block btn-tn" 
+                (click)="generarCatalogo()">
+                Generar
+                </button>
+            </div>
+            <div class="col-md-2 col-sm-12 form-group d-flex align-items-end">
+                <button 
+                class="btn btn-info btn-block btn-tn" 
+                (click)="limpiar()">
+                Limpiar
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12" style="height: 250px;">
+            </div>
+        </div>
+    </form>
+</div>
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

@@ -1,0 +1,230 @@
+<br>
+
+<!-- ===================== MODO DINÁMICO ===================== -->
+<form autocomplete="off" [formGroup]="formDinamico" *ngIf="modoDinamico">
+
+  <!-- Proveedor -->
+  <div class="row">
+    <div class="col-md-6 col-sm-12">
+      <div class="form-group">
+        <label class="form-control-label">Proveedor</label>
+        <input type="text"
+          class="form-control"
+          placeholder="Buscar proveedor..."
+          formControlName="supplier_razon_social"
+          [class.is-invalid]="din_supplier_razon_socialNoValido"
+          (focus)="mostrarAutocompletado()"
+          (blur)="ocultarAutocompletado()"
+          (click)="inputSupplierDin.select()"
+          #inputSupplierDin>
+        <small *ngIf="din_supplier_razon_socialNoValido" class="text-danger">
+          Campo requerido
+        </small>
+        <small *ngIf="din_supplier_idNoValido && !din_supplier_razon_socialNoValido" class="text-danger">
+          Selecciona un proveedor de la lista
+        </small>
+      </div>
+
+      <!-- Dropdown autocomplete -->
+      <div *ngIf="suppliersFiltrados.length > 0 && showDropdown">
+        <div class="card shadow-sm position-absolute" style="z-index: 1000; width: 95%; margin-top: 2px;">
+          <ul class="list-group list-group-flush p-0"
+            style="max-height: 200px; overflow-y: auto; margin-bottom: 0;">
+            <li class="list-group-item disabled py-1 text-muted" style="font-size: 0.85rem;">
+              -- Selecciona una opción --
+            </li>
+            <li *ngFor="let item of suppliersFiltrados"
+                class="list-group-item list-group-item-action py-2"
+                (mousedown)="seleccionarSupplier(item)"
+                style="cursor: pointer;">
+              <div class="font-weight-bold text-dark">{{ item.razon_social }}</div>
+              <small class="text-muted">{{ item.categoria || 'Sin Categoría' }}</small>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br>
+
+  <!-- Producto -->
+  <!-- <div class="row">
+    <div class="col-md-6 col-sm-12">
+      <div class="form-group">
+        <label class="form-control-label">Producto</label>
+        <input type="text"
+          class="form-control"
+          placeholder="Ej. Sudadera deportiva"
+          formControlName="producto"
+          [class.is-invalid]="din_productoNoValido">
+        <small *ngIf="din_productoNoValido" class="text-danger">
+          Campo requerido
+        </small>
+      </div>
+    </div>
+  </div> -->
+
+  <!-- <div class="row" *ngIf="codigoGenerado">
+    <div class="col-md-6 col-sm-12">
+      <div class="form-group">
+        <label class="form-control-label">Código generado</label>
+        <div class="input-group">
+          <input type="text"
+            class="form-control"
+            [value]="codigoGenerado"
+            readonly
+            style="background: #f8f9fa; font-weight: bold; letter-spacing: 1px;">
+          <div class="input-group-append">
+            <span class="input-group-text">
+              <i class="fa fa-tag"></i>
+            </span>
+          </div>
+        </div>
+        <small class="text-muted">Generado automáticamente al seleccionar proveedor</small>
+      </div>
+    </div>
+  </div> -->
+
+  <!-- Tallas y Colores en la misma fila -->
+  <div class="row">
+    <div class="col-md-4 col-sm-6">
+      <div class="form-group">
+        <label class="form-control-label">Tallas <small class="text-muted">(separadas por coma)</small></label>
+        <input type="text"
+          class="form-control"
+          placeholder="Ej. S, M, L, XL, 2XL"
+          formControlName="tallas"
+          [class.is-invalid]="din_tallasNoValido">
+        <small *ngIf="din_tallasNoValido" class="text-danger">
+          Campo requerido
+        </small>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-sm-6">
+      <div class="form-group">
+        <label class="form-control-label">Colores <small class="text-muted">(separados por coma)</small></label>
+        <input type="text"
+          class="form-control"
+          placeholder="Ej. Negro, Blanco, Rojo"
+          formControlName="colores"
+          [class.is-invalid]="din_coloresNoValido">
+        <small *ngIf="din_coloresNoValido" class="text-danger">
+          Campo requerido
+        </small>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <div class="form-group">
+        <label class="form-control-label">Precio (MX)</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">$</span>
+          </div>
+          <input type="text"
+            class="form-control"
+            placeholder="Ej. 230"
+            formControlName="precio"
+            [class.is-invalid]="din_precioNoValido">
+        </div>
+        <small *ngIf="din_precioNoValido" class="text-danger">
+          Campo requerido
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vista previa del texto generado -->
+  <div class="row" *ngIf="formDinamico.get('supplier_razon_social').value">
+    <div class="col-md-6 col-sm-12">
+      <div class="card" style="background: #f8f9fa; border-left: 3px solid #007bff;">
+        <div class="card-body py-2 px-3">
+          <small class="text-muted font-weight-bold">
+            <i class="fa fa-eye"></i> Vista previa del texto
+          </small>
+          <pre style="margin-top: 6px; margin-bottom: 0; font-size: 0.8rem; white-space: pre-wrap; font-family: inherit;">{{ generarTexto() }}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br>
+
+  <!-- Imágenes -->
+  <div class="row">
+    <div class="col-12">
+      <label class="form-control-label">
+        Imágenes (máximo {{ MAX_IMAGENES }}) — seleccionadas: {{ archivosSeleccionados.length }}
+      </label>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <button type="button" class="btn btn-tn btn-info"
+        [disabled]="archivosSeleccionados.length >= MAX_IMAGENES"
+        (click)="fileInputDin.click()"
+        style="margin-top: 8px;">
+        <i class="fa fa-plus"></i> Agregar imagen
+      </button>
+      <input #fileInputDin type="file" accept="image/*"
+        multiple style="display: none;"
+        (change)="onFilesSelected($event)">
+      <button type="button" class="btn btn-tn btn-success"
+        style="margin-top: 8px; margin-left: 8px;"
+        [disabled]="archivosSeleccionados.length >= MAX_IMAGENES"
+        (click)="cameraInputDin.click()">
+        <i class="fa fa-camera"></i> Tomar foto
+      </button>
+      <input #cameraInputDin type="file" accept="image/*" capture="environment"
+        style="display: none;"
+        (change)="onCameraCapture($event)">
+    </div>
+  </div>
+
+  <br>
+
+  <!-- Previews -->
+  <div class="row" *ngIf="previews.length > 0">
+    <div *ngFor="let preview of previews; let i = index"
+      class="col-6 col-md-3"
+      style="margin-bottom: 12px;">
+      <div style="position: relative;">
+        <img [src]="preview.safe"
+          style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px;">
+        <button type="button"
+          class="btn btn-danger btn-tn"
+          style="position: absolute; top: 4px; right: 4px;"
+          (click)="eliminarImagen(i)">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <br>
+
+  <!-- Botones -->
+  <div class="row">
+    <div class="col-12" style="text-align: right;">
+      <button type="button" class="btn btn-tn btn-secondary"
+        (click)="limpiarFormulario()">
+        Limpiar
+      </button>
+      <button type="button" class="btn btn-tn btn-primary"
+        style="margin-left: 8px;"
+        (click)="guardar()">
+        <i class="fa fa-save"></i> Guardar publicación
+      </button>
+    </div>
+  </div>
+
+</form>
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+  <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

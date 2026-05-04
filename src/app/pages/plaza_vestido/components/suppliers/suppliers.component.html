@@ -1,0 +1,187 @@
+
+<div>
+    <br>
+    <div class="row">
+        <div class="col-12" style="text-align: right">
+            <button style="display: inline-block;" type="button" class="btn btn-icon btn-tn btn-primary" 
+                title="Refresh" (click)="refreshTabla()"> 
+                    <i class="fa fa-refresh icon-refresh"></i>
+            </button>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-12" style="text-align: right">
+        <button style="display: inline-block;" type="button" class="btn btn-tn btn-primary" title="Crear" (click)="aCrear()">
+            Crear
+        </button>
+        </div>
+    </div>
+    <br>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">    
+                <div class="input-group">
+                    <input placeholder="Buscar..." class="form-control" type="text" id="inputSupplier" [(ngModel)]="inputTermino" (ngModelChange)="FilterByTermino()"/> 
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-12"> 
+        <div class="table-responsive">
+            <table class="table">
+            <thead>
+                <tr>
+                <th >ID</th>
+                <th >Categoría</th>
+                <th >Razón social</th>
+                <th >Contacto</th>
+                <th >Email</th>
+                <th >Teléfono</th>
+                <th >Acciones</th>
+                </tr>
+            </thead>  
+            <tbody>
+                <tr *ngFor="let item of items; let i = index" >
+                    
+                <td >{{ item.id }}</td>
+                <td >{{ item.categoria ? item.categoria : '-' }}</td>
+                <td >{{ item.razon_social }}</td>
+                <td >{{ item.contacto ? item.contacto : '-' }}</td>
+                <td >{{ item.email ? item.email : '-' }}</td>
+                <td >{{ item.telefono ? item.telefono : '-' }}</td>
+                <td >
+                    <button style="margin-top: 4px;" type="button" class="btn btn-tn btn-primary" title="Editar" (click)="aEditar(item, i)">Editar</button>
+                    <button style="margin-top: 4px;" type="button" class="btn btn-tn btn-primary" title="Eliminar" (click)="aEliminar(item, i)">Eliminar</button>
+                </td>
+                </tr>
+            </tbody>
+            </table>
+        </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-12"> 
+        <div class="btn-toolbar" role="toolbar" style="margin: 0;">
+            <div class="btn-group">
+            <label style="margin-top:10px">Página {{currentIndex}}/{{pageNumber}} </label>
+            </div>
+            <div class="btn-group pull-right">
+            <ul class="pagination" >
+                <li class="page-item" [ngClass]="{'disabled': (currentIndex == 1 || pageNumber == 0)}" ><a class="page-link"  (click)="prevPage()" >Atrás</a></li>
+                <li class="page-item" *ngFor="let page of pagesIndex"  [ngClass]="{'active': (currentIndex == page)}">
+                    <a class="page-link" (click)="setPage(page)"  >{{page}} </a>
+                </li>
+                <li class="page-item" [ngClass]="{'disabled': (currentIndex == pageNumber || pageNumber == 0)}" ><a class="page-link"   (click)="nextPage()" >Siguiente</a></li>
+            </ul>
+            </div>
+        </div> 
+        </div>
+    </div>
+</div>
+
+<ng-template #modalCrear id="modalCrear" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Proveedor</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <form autocomplete="off" [formGroup]="myForm">
+
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-control-label" for="input-categoria">Categoría</label>
+                    <input type="text" id="input-categoria" class="form-control" placeholder="Ej: Ropa" formControlName="categoria" [class.is-invalid]="categoriaNoValido">
+                    <small *ngIf="categoriaNoValido" style="color: #dc3545 !important;">
+                        Campo inválido
+                    </small>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-control-label" for="input-razon_social">Razón social</label>
+                    <input type="text" id="input-razon_social" class="form-control" placeholder="Ej: Empresa S.A." formControlName="razon_social" [class.is-invalid]="razon_socialNoValido">
+                    <small *ngIf="razon_socialNoValido" style="color: #dc3545 !important;">
+                        Campo requerido
+                    </small>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-control-label" for="input-contacto">Contacto</label>
+                    <input type="text" id="input-contacto" class="form-control" placeholder="Ej: Juan Pérez" formControlName="contacto" [class.is-invalid]="contactoNoValido">
+                    <small *ngIf="contactoNoValido" style="color: #dc3545 !important;">
+                        Campo inválido
+                    </small>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-control-label" for="input-telefono">Teléfono</label>
+                    <input type="text" id="input-telefono" class="form-control" placeholder="Teléfono" formControlName="telefono" [class.is-invalid]="telefonoNoValido">
+                    <small *ngIf="telefonoNoValido" style="color: #dc3545 !important;">
+                        Campo inválido
+                    </small>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-control-label" for="input-email">Email</label>
+                    <input type="text" id="input-email" class="form-control" placeholder="Email" formControlName="email" [class.is-invalid]="emailNoValido">
+                    <small *ngIf="emailNoValido" style="color: #dc3545 !important;">
+                        Campo inválido
+                    </small>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-control-label" for="input-direccion">Dirección</label>
+                    <textarea id="input-direccion" name="input-direccion" rows="3" class="form-control" placeholder="Ej: Calle 123" formControlName="direccion" [class.is-invalid]="direccionNoValido" maxlength="1000"></textarea>
+                    <small *ngIf="direccionNoValido" style="color: #dc3545 !important;">
+                        Campo inválido
+                    </small>
+                </div>
+            </div>
+        </div>
+
+    </form>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="guardar()">Aceptar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalEliminar id="modalEliminar" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Eliminar</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <p>
+      <strong>¿Realmente desea eliminar este Proveedor?</strong>
+    </p>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="eliminar()">Aceptar</button>
+  </div>
+</ng-template>
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

@@ -1,0 +1,47 @@
+<nb-layout >
+
+  <nb-layout-column style="background-color: rgba(0,82,150,1);">
+    <!-- <nb-card-header>
+      <h2 class="title">Login</h2>
+      <small class="form-text sub-title">Hola! Ingresa con tu Email y Password</small>
+    </nb-card-header> -->
+    <nb-card style="background-color: rgba(255,255,255,1);">
+      <nb-card-body>
+        
+        
+        <div class="flex-centered col-xl-4 col-lg-6 col-md-8 col-sm-12">
+
+          <img class="img-fluid" src="assets/images/LogoInterNow.png" alt="" style="max-width: 70% !important;">
+          <!-- <h2 class="title" style="color: rgba(0,0,0,1);">Cotizaciones</h2>
+          <small class="form-text sub-title" style="color: rgba(0,0,0,1);">Demo</small> -->
+          <br>
+
+          <form (ngSubmit)="Ingresar()" #form="ngForm" autocomplete="nope">
+
+            <div class="form-group">
+              <label for="input-email" style="color: rgba(0,0,0,1);">EMAIL</label>
+                <input name="email" [(ngModel)]="email" id="input-email" pattern=".+@.+..+" class="form-control" placeholder="" style="background-color: rgba(228,118,21,1);">
+            </div>
+
+            <div class="form-group">
+              <label for="input-password" style="color: rgba(0,0,0,1);">PASSWORD</label>
+              <input name="password" [(ngModel)]="password" type="password" id="input-password" class="form-control" placeholder=""  style="background-color: rgba(228,118,21,1);"> 
+            </div>
+
+            <button [disabled]="submitted || !form.valid" class="btn btn-block btn-hero-success"                [class.btn-pulse]="submitted">INGRESAR </button>
+          </form>
+        </div>
+      </nb-card-body>
+    </nb-card>
+  </nb-layout-column>
+</nb-layout>
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div> 
+
+
+
+  

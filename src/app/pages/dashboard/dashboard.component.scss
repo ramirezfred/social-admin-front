@@ -1,0 +1,105 @@
+@import '../../@theme/styles/themes';
+@import '~bootstrap/scss/mixins/breakpoints';
+@import '~@nebular/theme/styles/global/bootstrap/breakpoints';
+
+@include nb-install-component() {
+  .solar-card nb-card-header {
+    border: none;
+    padding-bottom: 0;
+  }
+
+  @include media-breakpoint-down(sm) {
+    ngx-traffic {
+      display: none;
+    }
+  }
+
+  @include media-breakpoint-down(is) {
+    /deep/ nb-card.large-card {
+      height: nb-theme(card-height-medium);
+    }
+  }
+
+
+  .diagrama {
+    display: block;
+    height: nb-theme(card-height-medium);
+    width: 100%;
+
+    /deep/ chart {
+      display: block;
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+  ngx-chartjs-pie,
+  ngx-chartjs-bar,
+  ngx-chartjs-line,
+  ngx-chartjs-multiple-xaxis,
+  ngx-chartjs-bar-horizontal,
+  ngx-chartjs-radar {
+    display: block;
+    height: nb-theme(card-height-medium);
+    width: 100%;
+
+    /deep/ chart {
+      display: block;
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+    .tabla{
+
+      .star {
+        //font-size: 1.5rem;
+        color: nb-theme(color-fg);
+      }
+
+        .show-grid {
+        .row {
+          margin: -0.5rem;
+        }
+
+        div[class^=col-] {
+          padding: 0.5rem;
+          box-sizing: border-box;
+
+          div {
+            text-align: center;
+            background-color: nb-theme(color-bg-active);
+            padding: 0.75rem 0.25rem;
+            border-radius: 0.25rem;
+          }
+        }
+      }
+
+      .grid-h {
+        margin-top: 1.5rem;
+
+        &:first-child {
+          margin-top: 0;
+        }
+      }
+
+      .table-responsive {
+        margin-top: 1rem;
+      }
+    }
+
+    .loader {
+        border: 16px solid #f3f3f3; /* Light grey */
+        border-top: 16px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+}

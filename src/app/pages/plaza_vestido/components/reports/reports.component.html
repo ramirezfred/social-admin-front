@@ -1,0 +1,67 @@
+<div>
+    <br>
+    <form autocomplete="off" [formGroup]="myForm">
+        
+        <div class="form-row"> 
+
+            <div class="col-md-2 offset-md-2 col-sm-12 form-group">
+                <label for="selectedStartDate">Fecha inicial:</label>
+                <input 
+                type="date"
+                class="form-control" 
+                formControlName="fecha_inicio" 
+                id="selectedStartDate" />
+            </div>
+
+            <div class="col-md-2 col-sm-12 form-group">
+                <label for="selectedEndDate">Fecha final:</label>
+                <input 
+                type="date"
+                class="form-control" 
+                formControlName="fecha_fin" 
+                id="selectedEndDate" />
+            </div>
+
+            <div class="col-md-4 col-sm-12">
+                <div class="form-group">
+                    <label class="form-control-label" for="tipo">Tipo</label>
+                    <select class="form-control" id="tipo" formControlName="tipo">
+                        <option value="" disabled>Selecciona un tipo</option>
+                        <option [value]="'semanal'">Semanal</option> 
+                        <option [value]="'general'">General</option>
+                        <option [value]="'generalSimple'">General Simple</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-2 offset-md-2 col-sm-12 form-group d-flex align-items-end">
+                <button 
+                class="btn btn-primary btn-block btn-tn" 
+                (click)="generarCatalogo()">
+                Generar
+                </button>
+            </div>
+            <div class="col-md-2 col-sm-12 form-group d-flex align-items-end">
+                <button 
+                class="btn btn-info btn-block btn-tn" 
+                (click)="limpiar()">
+                Limpiar
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12" style="height: 250px;">
+            </div>
+        </div>
+    </form>
+</div>
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

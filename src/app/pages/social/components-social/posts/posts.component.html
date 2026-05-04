@@ -1,0 +1,173 @@
+<br>
+<div class="row" [hidden]="false">
+  <div class="col-12" style="text-align: right">
+    <button style="display: inline-block;" type="button" class="btn btn-icon btn-tn btn-primary" title="Refresh" (click)="refreshTabla()" [disabled]="false"> <i class="fa fa-refresh icon-refresh"></i>
+    </button>
+  </div>
+</div>
+
+
+<div class="row" [hidden]="true">
+  <br>
+  <div class="col-12">
+    <nb-card>
+      <nb-card-header>
+        <div class="row">
+          <div class="col-6">
+            Solicitar imagen a Dall-E
+          </div>
+        </div>
+      </nb-card-header>
+      <nb-card-body>
+        <div class="row">
+          <div class="col-12">
+            <label for="input-prompt">Prompt</label>
+            <input type="text" placeholder="Prompt" class="form-control" [(ngModel)]="prompt" />
+          </div>
+        </div>
+        <br>
+        <div id="miDiv" #divCapturar [hidden]="true">
+          <canvas #canvas></canvas>
+        </div>
+      </nb-card-body>
+      <nb-card-footer>
+        <div class="text-right">
+          <button type="button" class="btn btn-tn btn-primary" (click)="dalle()" [disabled]="prompt == '' ">
+            Dall-E
+          </button>
+        </div>
+      </nb-card-footer>
+    </nb-card>
+  </div>
+</div>
+
+<div *ngIf="imgPostBase64" class="row" [hidden]="true">
+  <div class="col-xl-5 col-lg-6 col-md-6 col-sm-9" style="display:block; margin:auto">
+    <nb-card>
+      <nb-card-body>
+        <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img class="d-block w-100" src="{{imgPostBase64}}" alt="Second slide">
+            </div>
+          </div>
+        </div>
+      </nb-card-body>
+      <nb-card-footer>
+        <div class="text-right">
+          <select id="input-marco" class="form-control"
+            name="marco" [(ngModel)]="marcoBase64" (change)="changeMarco($event.target.value)">
+            <option *ngFor="let marco of marcos" [value]="marco.base64">{{marco.nombre}}</option>
+          </select>
+          <button type="button" style="margin-top: 8px;" class="btn btn-tn btn-primary" (click)="descargarImg()">
+            Descargar
+          </button>
+          <button type="button" style="margin-top: 8px;" class="btn btn-tn btn-primary" (click)="subirArchivo()">
+            Cargar
+          </button>
+        </div>
+      </nb-card-footer>
+    </nb-card>
+  </div>
+</div>
+
+
+<div *ngIf="listado.length > 0" class="row">
+  <div class="col-xl-5 col-lg-6 col-md-6 col-sm-9" style="display:block; margin:auto">
+    <nb-card>
+      <nb-card-header>
+        Marca {{selectObj.marca.nombre}}
+      </nb-card-header>
+      <nb-card-body>
+        <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img class="d-block w-100" src="{{imgPostBase64}}" alt="Second slide">
+            </div>
+          </div>
+          <a class="carousel-control-prev" role="button" data-slide="prev" ngClass="{'carousel-control-prev':true}" (click)="imagenAnterior()" >
+            <!-- <span class="carousel-control-prev-icon" aria-hidden="true"
+              style="width: 35px;height: 35px;"></span>
+            <span class="sr-only">Previous</span> -->
+            <span>
+              <i style="font-size: 40px; 
+                color: grey;" 
+                class="fa fa-chevron-left" aria-hidden="true"></i>
+            </span>
+          </a>
+          <a class="carousel-control-next" role="button" data-slide="next" ngClass="{'carousel-control-next':true}" (click)="imagenSiguiente()">
+            <!-- <span class="carousel-control-next-icon" aria-hidden="true"
+              style="width: 35px;height: 35px;"></span>
+            <span class="sr-only">Next</span> -->
+            <span>
+              <i style="font-size: 40px; 
+                color: grey;"
+                class="fa fa-chevron-right" aria-hidden="true"></i>
+            </span>
+          </a>
+        </div>
+        <br>
+        <p>
+          {{selectObj.texto}}
+        </p>
+      </nb-card-body>
+      <nb-card-footer>
+        <div class="text-center">
+          <button type="button" class="btn btn-tn btn-primary" (click)="open(modalEliminar)">
+            No Aprobar
+          </button>
+          <button type="button" class="btn btn-tn btn-primary" (click)="open(modalAprobar)">
+            Aprobar
+          </button>
+        </div>
+      </nb-card-footer>
+    </nb-card>
+  </div>
+</div>
+
+<ng-template #modalEliminar id="modalEliminar" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">No aprobar: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <p>
+      <strong>¿Marcar como No Aprobado este post?</strong>
+    </p>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-danger" (click)="c('Close click');eliminarPost()">Aceptar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalAprobar id="modalAprobar" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Aprobar: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <p>
+      <strong>¿Marcar como Aprobado este post?</strong>
+    </p>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-danger" (click)="c('Close click');subirArchivoVps()">Aceptar</button>
+  </div>
+</ng-template>
+
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

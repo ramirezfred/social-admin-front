@@ -1,0 +1,299 @@
+<br>
+<div class="row">
+  <div class="col-12" style="text-align: right">
+    <button style="display: inline-block;" type="button" class="btn btn-icon btn-tn btn-primary" title="Refresh" (click)="refreshTabla()"> <i class="fa fa-refresh icon-refresh"></i>
+    </button>
+  </div>
+</div>
+<br>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">    
+      <div class="input-group">
+        <input placeholder="Buscar..." class="form-control" type="text" id="inputTermino2" [(ngModel)]="inputTermino" (ngModelChange)="FilterByTermino()"/> 
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+
+<div class="row">
+  <div class="col-12"> 
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th >ID</th>
+            <th >Fecha de alta</th>
+            <th >Nombre</th>
+            <th >Empresa</th>
+            <th >Teléfono</th>
+            <th >Último pago</th>
+            <th >Facturas</th>
+            <th >Consultas</th>
+            <th >Status</th>
+            <th >Acciones</th>
+          </tr>
+        </thead>  
+        <tbody>
+          <tr *ngFor="let item of items; let i = index" >
+              
+            <td >{{item.id}}</td>
+            <td >{{item.created_at}}</td>
+            <td >{{item.nombre}}</td>
+            <td >
+              <i class="ion-edit" style="cursor:pointer;" (click)="aEditarEmpresa(item, i)"></i>&nbsp;{{item.empresa}}
+            </td>
+            <td >
+              {{item.telefono}}&nbsp;
+              <a href="https://wa.me/{{item.telefono}}" target="_blank">
+                <i class="fa fa-whatsapp whatsapp-icon"></i>
+              </a>
+            </td>
+            <td >{{item.last_pay_date}}</td>
+            <td >{{item.count_facturas}}</td>
+            <td >{{item.count_querys}}</td>
+            <td >
+              <nb-checkbox [(ngModel)]="item.status" (change) = "ChangeStatus(item)" style="cursor:pointer;">
+                <div *ngIf="!item.status">OFF</div>
+                <div *ngIf="item.status">ON</div>
+              </nb-checkbox>
+            </td>
+            <td >
+              <button style="margin-top: 4px;" type="button" class="btn btn-tn btn-primary" title="Ver Chat" (click)="getChat(item.id)">Ver Chat</button>
+              <button style="margin-top: 4px;" type="button" class="btn btn-tn btn-primary" title="Ver habildades" (click)="aEditarHabilidades(item, i)">Habilidades</button>
+              <button style="margin-top: 4px;" type="button" class="btn btn-tn btn-primary" title="Eliminar Usuario" (click)="open(modalEliminarUser);aEliminarUser(item, i)">Eliminar Usuario</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<br>
+<div class="row">
+  <div class="col-12"> 
+    <div class="btn-toolbar" role="toolbar" style="margin: 0;">
+      <div class="btn-group">
+         <label style="margin-top:10px">Página {{currentIndex}}/{{pageNumber}} </label>
+      </div>
+      <div class="btn-group pull-right">
+         <ul class="pagination" >
+            <li class="page-item" [ngClass]="{'disabled': (currentIndex == 1 || pageNumber == 0)}" ><a class="page-link"  (click)="prevPage()" >Atrás</a></li>
+            <li class="page-item" *ngFor="let page of pagesIndex"  [ngClass]="{'active': (currentIndex == page)}">
+              <a class="page-link" (click)="setPage(page)"  >{{page}} </a>
+            </li>
+            <li class="page-item" [ngClass]="{'disabled': (currentIndex == pageNumber || pageNumber == 0)}" ><a class="page-link"   (click)="nextPage()" >Siguiente</a></li>
+         </ul>
+      </div>
+    </div> 
+  </div>
+</div>
+
+<ng-template #modalChat id="modalChat" let-c="close" let-d="dismiss">
+
+  <style>
+    .chat-container {
+      margin: 0 auto;
+    }
+
+    .chat-container .chat-box {
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-container .user-message {
+      background-color: #dcf8c6;
+      align-self: flex-end;
+      border-radius: 5px;
+      padding: 5px;
+    }
+
+    .chat-container .bot-message {
+      background-color: #e2f1fd;      
+      align-self: flex-start;
+      border-radius: 5px;
+      padding: 5px;
+    }
+
+    .chat-container .message-text {
+      max-width: 100%;
+      word-break: break-all;
+    }
+
+    .chat-container .message-time {
+      font-size: 12px;
+      color: #777;
+      margin-top: 5px;
+    }
+
+  </style>
+
+  <div class="modal-header">
+    <h4 class="modal-title">Chat: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body" style="padding: 0;">
+    <br>
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+
+          <div class="chat-container">
+            <div class="chat-box" *ngFor="let message of chat.mensajes">
+              <div [ngClass]="{'user-message': message.autor === 1, 'bot-message': message.autor === 0}">
+                <div class="message-text">
+                  <strong>{{ message.autor_text }}:</strong> {{ message.text }}
+                </div>
+                <div class="message-time">
+                  {{ message.created_at }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- <form (ngSubmit)="sendMessage()">
+            <div class="form-group">
+              <input type="text" class="form-control" [(ngModel)]="newMessage" placeholder="Type your message" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Send</button>
+          </form> -->
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Atrás</button>
+  </div>
+</ng-template>
+
+<ng-template #modalEmpresa let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Nombre comercial: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="input-group">
+
+      <input type="text" placeholder="" class="form-control" [(ngModel)]="empresa" maxlength="95"/>
+
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')" #btnAtras id="btnAtras">Atrás</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="editarEmpresa()">Aceptar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalHabilidades let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Habilidades: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click');atras()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-6">
+        Citas
+      </div>
+      <div class="col-6">
+        <nb-checkbox [(ngModel)]="selectObj.hab_citas" (change) = "ChangeHab(1,selectObj)" style="cursor:pointer;">
+          <div *ngIf="!selectObj.hab_citas">OFF</div>
+          <div *ngIf="selectObj.hab_citas">ON</div>
+        </nb-checkbox>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-6">
+        Redes Sociales
+      </div>
+      <div class="col-6">
+        <nb-checkbox [(ngModel)]="selectObj.hab_redes" (change) = "ChangeHab(2,selectObj)" style="cursor:pointer;">
+          <div *ngIf="!selectObj.hab_redes">OFF</div>
+          <div *ngIf="selectObj.hab_redes">ON</div>
+        </nb-checkbox>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-6">
+        Pedidos
+      </div>
+      <div class="col-6">
+        <nb-checkbox [(ngModel)]="selectObj.hab_pedidos" (change) = "ChangeHab(3,selectObj)" style="cursor:pointer;">
+          <div *ngIf="!selectObj.hab_pedidos">OFF</div>
+          <div *ngIf="selectObj.hab_pedidos">ON</div>
+        </nb-checkbox>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-6">
+        Cotizaciones
+      </div>
+      <div class="col-6">
+        <nb-checkbox [(ngModel)]="selectObj.hab_cotizaciones" (change) = "ChangeHab(4,selectObj)" style="cursor:pointer;">
+          <div *ngIf="!selectObj.hab_cotizaciones">OFF</div>
+          <div *ngIf="selectObj.hab_cotizaciones">ON</div>
+        </nb-checkbox>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-6">
+        Facturas
+      </div>
+      <div class="col-6">
+        <nb-checkbox [(ngModel)]="selectObj.hab_facturas" (change) = "ChangeHab(5,selectObj)" style="cursor:pointer;">
+          <div *ngIf="!selectObj.hab_facturas">OFF</div>
+          <div *ngIf="selectObj.hab_facturas">ON</div>
+        </nb-checkbox>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-6">
+        <div class="form-group">
+          <label for="InputLimite">Límite de facturas</label>
+          <input type="number" id="InputLimite" placeholder="Límite de facturas" class="form-control" [(ngModel)]="selectObj.max_facturas" min="0"/>
+        </div>
+      </div>
+      <div class="col-6">
+        <button style="margin-top: 38px;" type="button" class="btn btn-tn btn-outline-primary" (click)="updateMaxFacturas(selectObj)">Actualizar</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click');atras()" #btnAtras2 id="btnAtras2">Atrás</button>
+  </div>
+</ng-template>
+
+<ng-template #modalEliminarUser id="modalEliminarUser" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Eliminar usuario: </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <p>
+      <strong>¿Realmente desea eliminar este usuario?</strong>
+    </p>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="c('Close click');eliminarUser()">Aceptar</button>
+  </div>
+</ng-template>
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>
