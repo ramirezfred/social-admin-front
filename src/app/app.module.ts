@@ -16,7 +16,6 @@ import { ThemeModule } from './@theme/theme.module';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 //Mis imports
-import { RutaBaseService } from './services/ruta-base/ruta-base.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoadingModule, ANIMATION_TYPES  } from 'ngx-loading';
 
@@ -25,17 +24,14 @@ import { LoadingModule, ANIMATION_TYPES  } from 'ngx-loading';
 
 import { ToasterModule } from 'angular2-toaster';
 
-import { UploadService } from './services/upload-service/upload.service';
-
-import { ApiService } from './services/guias/api/api.service';
 import { SocialApiService } from './services/social/api/api.service';
-import { FacturacionApiService } from './services/facturacion/api/api.service';
-
+import { SesionService } from './services/sesion/sesion.service';
 import { PublicationService } from './services/publications/publication.service';
 import { SupplierService } from './services/publications/supplier.service';
 import { OfflineQueueService } from './services/publications/offline-queue.service';
 
 import { AuthGuard } from './guards/auth.guard';
+import { AdminGuard } from './guards/admin.guard';
 
 @NgModule({
   declarations: [AppComponent],
@@ -68,14 +64,12 @@ import { AuthGuard } from './guards/auth.guard';
   bootstrap: [AppComponent],
   providers: [
     AuthGuard,
+    AdminGuard,
     PublicationService,
     SupplierService,
     OfflineQueueService,
-    UploadService,
-    RutaBaseService,
-    ApiService,
     SocialApiService,
-    FacturacionApiService,
+    SesionService,
     { provide: APP_BASE_HREF, useValue: '/' },
   ],
 })

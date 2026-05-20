@@ -233,6 +233,17 @@
         font-weight: nb-theme(font-weight-normal);
       }
     }
+
+    .logo-img {
+      height: 50px;
+      width: auto;
+      display: block;
+      margin: auto;
+    }
+
+    .logo img {
+      height: 50px;
+    }
   }
 
   .toggle-layout /deep/ a {
@@ -266,6 +277,10 @@
     nb-user /deep/ .user-name {
       display: none;
     }
+
+    .logo img {
+      height: 35px !important;
+    }
   }
 
   @include media-breakpoint-down(is) {
@@ -288,6 +303,10 @@
   @include media-breakpoint-down(xs) {
     .right /deep/ {
       display: none;
+    }
+
+    .logo img {
+      height: 28px !important;
     }
   }
 }

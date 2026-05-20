@@ -7,12 +7,11 @@ import { RouterModule, Routes, Router, ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import 'rxjs/add/operator/toPromise';
 
-import { RutaBaseService } from '../../services/ruta-base/ruta-base.service';
-
 import { ToasterService, ToasterConfig, Toast, BodyOutputType } from 'angular2-toaster';
 import 'style-loader!angular2-toaster/toaster.css';
 
 import { SocialApiService } from '../../services/social/api/api.service';
+import { SesionService } from '../../services/sesion/sesion.service';
 
 @Component({
   selector: 'ngx-loginf',
@@ -48,12 +47,12 @@ export class LoginfComponent implements OnInit {
 
 	constructor( private toasterService: ToasterService,
 				 private http: HttpClient,
-				 private rutaService: RutaBaseService,
 				 private router: Router,
 				 private route: ActivatedRoute,
 				 public nbspinnerservice:NbSpinnerService,
 				 public themeService:NbThemeService,
 				 private api_serv: SocialApiService,
+				 private sesion_serv: SesionService
 	)
 	{
 
@@ -156,13 +155,12 @@ export class LoginfComponent implements OnInit {
 			console.log(data);
 		   
 			that.loading = false;
-			if (data.user.id && data.user.tipo == 1) {
-			//   that.sesion_serv.setUser(data.user);
-			  //admin
+			if (data.user.id && (data.user.tipo == 1 || data.user.tipo == 4) ) {
+				that.sesion_serv.setUser(data.user);
 			  
-			  that.router.navigateByUrl('/pages/publications');
+			  	that.router.navigateByUrl('/pages/publications');
 			  
-			}else if(data.user.id && data.user.tipo != 1){
+			}else if(data.user.id && data.user.tipo != 1 && data.user.tipo != 4){
 				that.showToast('error', 'Error!', 'Acceso no autorizado');
 			}else{
 			  that.showToast('error', 'Error!', 'Error al autenticar usuario');

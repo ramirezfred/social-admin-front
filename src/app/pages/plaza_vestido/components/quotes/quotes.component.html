@@ -14,10 +14,32 @@
     <div class="col">    
       <div style="text-align: right;">
         <button style="display: inline-block;" class="btn btn-icon btn-tn btn-primary" 
-          title="Cotizar" (click)="aCrear()">
+          title="Cotizar" (click)="aCrear()" [disabled]="userRole === 1 && userIdSel !== '1'">
             Cotizar
         </button>
       </div>
+    </div>
+  </div>
+  <br>
+  <div class="form-row mb-3" *ngIf="userRole === 1">
+    <div class="col-md-4 offset-md-3 col-sm-12 form-group">
+      <label class="form-control-label" for="userIdSel">Filtrar por Vendedor:</label>
+      <select
+        class="form-control" id="userIdSel" 
+        [(ngModel)]="userIdSel" 
+        (change)="onEmpleadoChange($event.target.value)">
+        <option value="1">Mis Cotizaciones (Admin)</option>
+        <option *ngFor="let emp of empleados" [value]="emp.id">
+          {{ emp.nombre }}
+        </option>
+      </select>
+    </div>
+    <div class="col-md-2 col-sm-12 form-group d-flex align-items-end">
+        <button 
+        class="btn btn-info btn-block btn-tn" 
+        (click)="limpiar()">
+        Limpiar
+        </button>
     </div>
   </div>
   <br>
@@ -31,6 +53,90 @@
       </div>
   </div>
   <br>
+  <div class="row" *ngIf="userRole === 1">
+    <div class="col-12"> 
+      <div class="alert alert-info d-flex align-items-center" role="alert">
+        <!-- Icono de información o usuario -->
+        <i class="fa fa-info-circle mr-2" aria-hidden="true"></i> 
+        <div>
+          Visualizando resultados de: <strong>{{ userNombreSel }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && estadisticas !== null">
+    <div *ngIf="estadisticas" class="row mb-4">
+      <div class="col-12">
+        <div class="card bg-gradient-primary text-white shadow-lg">
+          <div class="card-body">
+            <div class="row align-items-center">
+              
+              <!-- Columna Principal: Récord Histórico -->
+              <div *ngIf="estadisticas.mejor_semana_historica; else sinRegistro" class="col-md-7 border-md-right">
+                <h5 class="mb-2">
+                  <i class="fa fa-trophy mr-2"></i>
+                  Mejor Semana Histórica
+                </h5>
+                <p class="mb-1 text-white-50">
+                  <i class="fa fa-calendar-o mr-1"></i>
+                  {{ estadisticas.mejor_semana_historica.fecha_inicio | date:'dd/MM/yyyy' }} - 
+                  {{ estadisticas.mejor_semana_historica.fecha_fin | date:'dd/MM/yyyy' }}
+                </p>
+                <h5 class="mb-0 fw-bold">
+                  ${{ estadisticas.mejor_semana_historica.total | number:'1.2-2' }}
+                  <span class="fs-6 fw-normal text-white-50 ms-2">({{ estadisticas.mejor_semana_historica.cantidad }} {{ estadisticas.mejor_semana_historica.cantidad == 1 ? 'orden' : 'ordenes'  }})</span>
+                </h5>
+              </div>
+
+              <!-- Plantilla Alternativa para cuando no hay récord histórico -->
+              <ng-template #sinRegistro>
+                <div class="col-md-7 border-md-right">
+                  <h5 class="mb-2">
+                    <i class="fa fa-trophy mr-2"></i>
+                    Mejor Semana Histórica
+                  </h5>
+                  <p class="mb-1 text-white-50">
+                    <i class="fa fa-frown-o mr-1"></i>
+                    Aún no hay registros
+                  </p>
+                </div>
+              </ng-template>
+
+              <!-- Columna Secundaria: Métricas de Control (Viernes a Jueves) -->
+              <div class="col-md-5 mt-3 mt-md-0 ps-md-4">
+                <div class="row g-2">
+                  
+                  <!-- Semana Pasada -->
+                  <div class="col-6 col-md-12 mb-md-2">
+                    <small class="d-block text-white-50 text-uppercase tracking-wider" style="font-size: 0.75rem;">
+                      <i class="fa fa-arrow-left mr-1"></i> Sem. Pasada (Vie-Jue)
+                    </small>
+                    <span class="h5 mb-0 fw-semibold">
+                      ${{ estadisticas.adelantado_pasada.total + estadisticas.pagado_pasada.total | number:'1.2-2' }} ({{estadisticas.adelantado_pasada.cantidad + estadisticas.pagado_pasada.cantidad}})
+                    </span>
+                  </div>
+                  
+                  <!-- Semana Actual -->
+                  <div class="col-6 col-md-12">
+                    <small class="d-block text-white-50 text-uppercase tracking-wider" style="font-size: 0.75rem;">
+                      <i class="fa fa-refresh mr-1"></i> Sem. Actual (Vie-Jue)
+                    </small>
+                    <span class="h5 mb-0 fw-semibold">
+                      ${{ estadisticas.pendiente_esta.total +estadisticas.adelantado_esta.total + estadisticas.pagado_esta.total | number:'1.2-2' }} ({{estadisticas.pendiente_esta.cantidad + estadisticas.adelantado_esta.cantidad + estadisticas.pagado_esta.cantidad}})
+                    </span>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="row">
     <div class="col-12"> 
       <div class="table-responsive">
@@ -102,7 +208,7 @@
                     <!-- Registrar pago (solo si no está pagado) -->
                     <button type="button"
                       class="btn btn-info btn-icon btn-tn"
-                      *ngIf="item.pago_estado !== 'pagado'"
+                      *ngIf="item.pago_estado !== 'pagado' && userId === item.user_id"
                       (click)="abrirModalPago(item)"
                       title="Registrar pago">
                       <i class="fa fa-credit-card"></i>
@@ -127,7 +233,7 @@
                     class="btn btn-tn btn-primary" 
                     title="Editar" 
                     (click)="aEditar(item, i)">
-                    Editar
+                    {{ userId === item.user_id ? 'Editar' : 'Ver' }}
                   </button>
 
                   <!-- Botón tipo entrega -->
@@ -135,6 +241,7 @@
                     style="margin-top: 4px;" 
                     type="button" 
                     class="btn btn-tn" 
+                    *ngIf="userId === item.user_id"
                     (click)="abrirModalTipoEntrega(item)"
                     title="Tipo de entrega"
                     [style.background]="item.tipo_entrega ? '#28a745' : '#555'">
@@ -145,7 +252,7 @@
                   <button
                     type="button" 
                     class="btn btn-tn" 
-                    *ngIf="item.pago_estado !== 'pagado'"
+                    *ngIf="item.pago_estado !== 'pagado' && userId === item.user_id"
                     (click)="abrirModalCancelar(item)"
                     title="Cancelar cotización"
                     style="background:#dc3545; color:#fff; margin-top: 4px;">
@@ -156,7 +263,7 @@
                   <button
                     type="button" 
                     class="btn btn-tn" 
-                    *ngIf="item.pago_estado === 'pagado'"
+                    *ngIf="item.pago_estado === 'pagado' && userId === item.user_id"
                     (click)="abrirModalFinalizar(item)"
                     title="Finalizar cotización"
                     style="background:#007bff; color:#fff; margin-top: 4px;">
@@ -207,7 +314,7 @@
 
   <form autocomplete="off" [formGroup]="myForm">
 
-    <div class="row">
+    <!-- <div class="row">
         <div class="col-md-4 col-sm-12">
             <div class="form-group">
                 <label class="form-control-label" for="moneda">Moneda</label>
@@ -221,7 +328,7 @@
                 </small>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <div class="row">
         <div class="col-md-4 col-sm-12">
@@ -253,7 +360,8 @@
         </div>
     </div>
 
-    <div class="row" style="margin-top: 15px;">
+    <div class="row" style="margin-top: 15px;"
+      [hidden]="accion === 1 && selectObj?.user_id !== userId">
         <div class="col-12"> 
           <button class="btn btn-tn btn-info" 
             title="Nuevo concepto" (click)="newConcepto()">
@@ -425,10 +533,14 @@
               <td>{{item.precio_unitario | number: '1.2-2'}}</td>
               <td>{{item.subtotal | number: '1.2-2'}}</td>
               <td >
-                <button type="button" class="btn btn-tn btn-danger" title="Eliminar concepto" (click)="eliminarConcepto(i, item)">
+                <button type="button" class="btn btn-tn btn-danger" 
+                  title="Eliminar concepto" (click)="eliminarConcepto(i, item)"
+                  [hidden]="accion === 1 && selectObj?.user_id !== userId">
                   <i class="fa fa-trash"></i>
                 </button>
-                <button type="button" class="btn btn-tn btn-danger" title="Editar concepto" (click)="editarConcepto(i, item)">
+                <button type="button" class="btn btn-tn btn-danger" 
+                  title="Editar concepto" (click)="editarConcepto(i, item)"
+                  [hidden]="accion === 1 && selectObj?.user_id !== userId">
                   <i class="fa fa-pencil"></i>
                 </button>
               </td>
@@ -476,7 +588,8 @@
               Atrás
           </button>
           <button style="display: inline-block;" type="button" class="btn btn-tn btn-info" 
-            title="Guardar cotización" (click)="guardar()"> 
+            title="Guardar cotización" (click)="guardar()"
+            [hidden]="accion === 1 && selectObj?.user_id !== userId"> 
               Guardar cotización
           </button>
         </div>

@@ -6,6 +6,9 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PublicationService } from '../../../../services/publications/publication.service';
 import { Publication } from '../../../../@core/models/publication.model';
 
+import { SocialApiService } from '../../../../services/social/api/api.service';
+import { SesionService } from '../../../../services/sesion/sesion.service';
+
 @Component({
   selector: 'app-lista',
   templateUrl: './lista.component.html',
@@ -55,15 +58,41 @@ export class ListaComponent implements OnInit {
 
   @Output() cont_publications_event : EventEmitter<number> = new EventEmitter();
 
+  public empleados: any[] = []; // Cargar desde un servicio
+  public userIdSel: string; // Valor inicial
+  public userNombreSel: string; // Valor inicial
+
+  userId: any;
+  userRole = 0;
+
   constructor(
     private modalService: NgbModal,
     private toasterService: ToasterService,
     private publicationService: PublicationService,
-  ) {}
+    private api_serv: SocialApiService,
+    private sesion_serv: SesionService
+  ) {
+
+    this.userId = this.sesion_serv.getUserId();
+    this.userRole = this.sesion_serv.getUserRol();
+
+    this.userIdSel = ((this.sesion_serv.getUserId()) ? this.sesion_serv.getUserId() : 0).toString();
+
+    this.userNombreSel = this.sesion_serv.getUserNombre();
+
+  }
 
   ngOnInit() {
     this.cont_publications_event.emit(0);
+    
+    //Admin
     this.getListado();
+    if (this.userRole === 1) {
+      setTimeout(() => {
+        this.getEmpleados();
+      }, 1500);
+    }
+    
   }
 
   private showToast(type: string, title: string, body: string) {
@@ -171,6 +200,48 @@ export class ListaComponent implements OnInit {
     this.refreshItems();
   }
 
+  // ---- Visualizar publicaciones de otros usuarios
+
+  onEmpleadoChange(idEmpleado: string) {
+
+    if(idEmpleado === '1'){
+      this.userNombreSel = 'Admin';
+    }else{
+      const empleadoEncontrado = this.empleados.find((emp: any) => emp.id === Number(idEmpleado));
+
+      this.userNombreSel = empleadoEncontrado ? empleadoEncontrado.nombre : '';
+    }
+
+    this.refrescarModoAleatorio(); // Recarga la tabla con el filtro
+  }
+
+  limpiar(){
+    this.userIdSel = '1';
+    this.userNombreSel = 'Admin';
+    this.refrescarModoAleatorio(); // Recarga la tabla con el filtro
+  }
+
+  getEmpleados(): void {
+
+    this.empleados = [];
+    
+    var that = this;
+
+    this.api_serv.getQuery(`plaza_vestido/employees`)
+    .subscribe({
+      next(response : any) {
+        console.log(response);
+        that.empleados = response.data;
+
+      },
+      error(msg) {
+        console.log(msg);
+        that.tratarError(msg);
+      }
+    });
+
+  }
+
   // ---- API ----
   getListado(): void {
     this.listado = [];
@@ -180,7 +251,9 @@ export class ListaComponent implements OnInit {
 
     var that = this;
 
-    this.publicationService.index()
+    let userId = Number(this.userIdSel);
+
+    this.publicationService.index(userId)
     .subscribe({
       next(response: Publication[]) {
         that.listado = response;
@@ -213,101 +286,7 @@ export class ListaComponent implements OnInit {
     this.getListado();
   }
 
-  // ---- Previsualizar ----
-  abrirModalPrevisualizar(item: Publication, modal: any) {
-    if (item._offline) {
-      // Publicación local — ya tiene todo, no necesita ir a la API
-      this.selectObj = item;
-      this.modalPrevisualizarVisible = true;
-      this.open(modal);
-    } else {
-      // Publicación del backend — traer con imágenes en base64
-      this.loading = true;
-      var that = this;
-
-      this.publicationService.show(item.id)
-      .subscribe({
-        next(response: Publication) {
-          that.loading = false;
-          that.selectObj = response;
-          that.modalPrevisualizarVisible = true;
-          that.open(modal);
-        },
-        error(msg) {
-          that.loading = false;
-          that.tratarError(msg);
-        }
-      });
-    }
-  }
-
-  cerrarModalPrevisualizar() {
-    this.modalPrevisualizarVisible = false;
-    this.selectObj = null;
-    if (this.modalRef) { this.modalRef.close(); }
-  }
-
   // ---- Publicar ----
-  async publicar(): Promise<void> {
-
-    if (!navigator.onLine) {
-      this.showToast('warning', 'Warning!', 'Necesitas conexión a internet para publicar.');
-      return;
-    }
-
-
-    const nav = navigator as any;
-
-    if (!nav.share) {
-      this.showToast('warning', 'Warning!', 'Tu navegador no soporta esta función. Usa Chrome en móvil.');
-      return;
-    }
-
-    try {
-      const archivos = await this.obtenerBlobs(this.selectObj);
-
-      if (!nav.canShare || !nav.canShare({ files: archivos })) {
-        this.showToast('warning', 'Warning!', 'El dispositivo no permite compartir estos archivos.');
-        return;
-      }
-
-      this.compartiendo = true;
-
-      await nav.share({
-        title : 'Publicación',
-        text  : this.selectObj.texto,
-        files : archivos
-      });
-
-      this.marcarPublicada(this.selectObj.id);
-
-    } catch (err) {
-      if (err && (err as any).name !== 'AbortError') {
-        this.showToast('error', 'Error!', 'Error al compartir.');
-      }
-    } finally {
-      this.compartiendo = false;
-    }
-  }
-
-  private marcarPublicada(id: number): void {
-    this.loading = true;
-    var that = this;
-
-    this.publicationService.publish(id)
-    .subscribe({
-      next(response: Publication) {
-        that.loading = false;
-        // that.showToast('success', 'Success!', 'Publicación marcada como publicada.');
-        that.cerrarModalPrevisualizar();
-        that.getListado();
-      },
-      error(msg) {
-        that.loading = false;
-        that.tratarError(msg);
-      }
-    });
-  }
 
   private async obtenerBlobs(pub: Publication): Promise<File[]> {
     return Promise.all(

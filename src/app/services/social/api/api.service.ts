@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 //Mis imports
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
+import { environment } from '../../../../environments/environment';
+
 @Injectable()
 export class SocialApiService {
 
@@ -13,10 +15,15 @@ export class SocialApiService {
   // public archivos_base = 'http://localhost/publicacionesIA/publicacionesIAAPI/public/archivos_uploads/';
 
   //Remoto vps
-  public api_base = `https://apisocial.internow.com.mx/api/`;
-  public images_base = `https://apisocial.internow.com.mx/images_uploads/`;
-  public api_public = `https://apisocial.internow.com.mx/`;
-  public archivos_base = `https://apisocial.internow.com.mx/archivos_uploads/`;
+  // public api_base = `https://apisocial.internow.com.mx/api/`;
+  // public images_base = `https://apisocial.internow.com.mx/images_uploads/`;
+  // public api_public = `https://apisocial.internow.com.mx/`;
+  // public archivos_base = `https://apisocial.internow.com.mx/archivos_uploads/`;
+
+  public api_base = `${environment.apiUrl}/api/`;
+  public images_base = `${environment.apiUrl}/images_uploads/`;
+  public api_public = `${environment.apiUrl}/`;
+  public archivos_base = `${environment.apiUrl}/archivos_uploads/`;
 
   constructor(private http: HttpClient) { }
 
@@ -59,27 +66,6 @@ export class SocialApiService {
   resetToken( ){
     localStorage.removeItem('social_token');    // localStorage.removeItem('id');
     localStorage.removeItem('social_expires_in');    // localStorage.removeItem('id');
-  }
-
-  estaAutenticado(): boolean {
-
-    if ( this.getToken().length < 2 ) {
-      return false;
-    }else{
-      return true;
-    }
-
-    // const expira = Number(localStorage.getItem('expires_in'));
-    // const expiraDate = new Date();
-    // expiraDate.setTime(expira);
-
-    // if ( expiraDate > new Date() ) {
-    //   return true;
-    // } else {
-    //   return false;
-    // }
-
-
   }
 
   postQuery( query : string, datos ){

@@ -5,5 +5,5 @@
  */
 export const environment = {
   production: true,
-  apiUrl: 'https://apisocial.internow.com.mx/api',
+  apiUrl: 'https://apisocial.internow.com.mx',
 };

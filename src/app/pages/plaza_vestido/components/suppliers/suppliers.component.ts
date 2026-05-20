@@ -17,6 +17,8 @@ import { Subscription } from 'rxjs';
 
 import { FormBuilder, FormArray, FormGroup, Validators, FormControl } from '@angular/forms';
 
+import { SesionService } from '../../../../services/sesion/sesion.service';
+
 @Component({
   selector: 'app-suppliers',
   templateUrl: './suppliers.component.html',
@@ -60,18 +62,21 @@ export class SuppliersComponent implements OnInit {
   @ViewChild('modalEliminar') modalEliminar : ElementRef;
   modalRef: any;
 
+  userRole = 0;
+
   constructor(
       private modalService: NgbModal,
       private toasterService: ToasterService,
       private http: HttpClient,
       private api_serv: SocialApiService,
       public fb: FormBuilder,
+      private sesion_serv: SesionService
   ) { 
     this.crearFormulario(0);
   }
 
   ngOnInit() {
-    
+    this.userRole = this.sesion_serv.getUserRol();
   }
 
   private showToast(type: string, title: string, body: string) {
@@ -372,6 +377,7 @@ export class SuppliersComponent implements OnInit {
     this.loading = true;
    
     var datos= {
+      user_id : this.sesion_serv.getUserId(),
       razon_social: this.myForm.value.razon_social,
       email: this.myForm.value.email,
       telefono: this.myForm.value.telefono,

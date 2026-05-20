@@ -11,8 +11,6 @@ import { RouterModule, Routes, Router, ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import 'rxjs/add/operator/toPromise';
 
-import { RutaBaseService } from './services/ruta-base/ruta-base.service';
-
 import { PublicationService } from './services/publications/publication.service'; // Ajusta la ruta
 
 @Component({
@@ -25,7 +23,6 @@ export class AppComponent implements OnInit {
   			 private router: Router,
 			 private route: ActivatedRoute,
 			 private http: HttpClient,
-			 private rutaService: RutaBaseService,
       private publicationService: PublicationService) {
   }
 

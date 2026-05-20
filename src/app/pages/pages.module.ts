@@ -5,8 +5,6 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { PagesRoutingModule } from './pages-routing.module';
 import { ThemeModule } from '../@theme/theme.module';
 
-// import { AuthGuard } from '../guards/auth.guard';
-
 const PAGES_COMPONENTS = [
   PagesComponent,
 ];
@@ -20,7 +18,6 @@ const PAGES_COMPONENTS = [
   declarations: [
     ...PAGES_COMPONENTS
   ],
-  // providers: [AuthGuard]
 })
 export class PagesModule {
 }

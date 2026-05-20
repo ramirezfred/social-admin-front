@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
-import { MENU_ITEMS } from './pages-menu';
+import { MENU_ADMIN, MENU_EMPLOYEE } from './pages-menu';
+
+import { SesionService } from '../services/sesion/sesion.service';
 
 @Component({
   selector: 'ngx-pages',
@@ -10,13 +12,24 @@ import { MENU_ITEMS } from './pages-menu';
       <router-outlet></router-outlet>
     </ngx-sample-layout>  `,
 })
-export class PagesComponent {
+export class PagesComponent implements OnInit {
 
-  menu = MENU_ITEMS;
+  menu : any = [];
 
-  constructor(){
+  constructor(private sesion_serv: SesionService){
 
-  	
+  }
+
+  ngOnInit() {
+    const userRole = this.sesion_serv.getUserRol();
+
+    if ( userRole === 1 ) {
+      this.menu = MENU_ADMIN;
+    } else if ( userRole === 4 ) {
+      this.menu = MENU_EMPLOYEE;
+    } else {
+      this.menu = [];
+    }
   }
 
   

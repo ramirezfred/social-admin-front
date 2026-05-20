@@ -1,0 +1,209 @@
+@import '../../../../@theme/styles/themes';
+@import '~@nebular/theme/styles/global/bootstrap/hero-buttons';
+@import '~bootstrap/scss/mixins/breakpoints';
+@import '~@nebular/theme/components/card/card.component.theme';
+@import '~@nebular/theme/styles/global/bootstrap/breakpoints';
+@import '~@nebular/theme/styles/core/mixins';
+
+@include nb-install-component() {
+
+  nb-card-body {
+    overflow: visible;
+  }
+
+  .input-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    padding: 0 0 0.75rem;
+  }
+
+  .text-invalid {
+    color: #dc3545 !important;
+  }
+
+  .control-invalid {
+    border-color: #dc3545 !important;
+  }
+
+  .input-color {
+    color: rgba(0,0,0,1);
+    background-color: rgba(231,227,227,1);
+  }
+
+  .show-grid {
+    .row {
+      margin: -0.5rem;
+    }
+
+    div[class^=col-] {
+      padding: 0.5rem;
+      box-sizing: border-box;
+
+      div {
+        text-align: center;
+        background-color: nb-theme(color-bg-active);
+        padding: 0.75rem 0.25rem;
+        border-radius: 0.25rem;
+      }
+    }
+  }
+
+  .grid-h {
+    margin-top: 1.5rem;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  .danger{
+    border: 1px solid #c71717;
+  }
+
+  @include media-breakpoint-down(xs) {
+    nb-tabset /deep/ul {
+      font-size: 1rem;
+      padding: 0 0.25rem;
+    }
+  }
+
+  .is-invalid{
+    border-color: rgb(157, 32, 3);
+  }
+
+  .text-danger {
+    color: rgb(246, 66, 102) !important;
+  }
+
+  /* statistics.component.css */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  /* Reemplazar bg-opacity-10 con clases manuales */
+  .bg-warning-soft {
+    background-color: #fff3cd !important;
+  }
+
+  .bg-success-soft {
+    background-color: #d1e7dd !important;
+  }
+
+  .card {
+    transition: transform 0.2s ease-in-out;
+    border-radius: 0.5rem;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+  }
+
+  .progress {
+    background-color: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    transition: width 0.6s ease;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .total-general {
+    border: none;
+    border-radius: 0.5rem;
+  }
+
+  .total-general .card-header {
+    border-bottom: none;
+    border-radius: 0.5rem 0.5rem 0 0;
+    font-weight: 600;
+  }
+
+  .total-general .card-body {
+    padding: 1.5rem;
+  }
+
+  /* Media queries responsive */
+  @media (max-width: 768px) {
+    .container-fluid {
+      padding: 1rem;
+    }
+    
+    .progress {
+      height: 25px !important;
+    }
+    
+    .progress-bar {
+      font-size: 0.8rem;
+    }
+    
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  /* Animación de carga */
+  @keyframes pulse {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  /* Estilos para mejorar la visualización */
+  .card-header i, 
+  .card-body i {
+    margin-right: 0.5rem;
+  }
+
+  .form-select:focus,
+  .form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    border-color: #80bdff;
+  }
+
+  .btn-primary {
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+  }
+
+  /* Estilo para el select de semanas */
+  .form-select {
+    cursor: pointer;
+  }
+
+  /* Mejora de contraste en la mejor semana */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+  }
+
+  .bg-gradient-primary .card-body {
+    padding: 1.5rem;
+  }
+
+  
+
+}
+
+

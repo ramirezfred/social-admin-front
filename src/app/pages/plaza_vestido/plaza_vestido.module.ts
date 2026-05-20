@@ -10,6 +10,8 @@ import { QuotesComponent } from './components/quotes/quotes.component';
 import { SuppliersComponent } from './components/suppliers/suppliers.component';
 import { HistoryComponent } from './components/history/history.component';
 import { ReportsComponent } from './components/reports/reports.component';
+import { EmployeesComponent }   from './components/employees/employees.component';
+import { StatisticsComponent } from './components/statistics/statistics.component';
 
 @NgModule({
   imports: [
@@ -31,7 +33,9 @@ import { ReportsComponent } from './components/reports/reports.component';
     QuotesComponent,
     SuppliersComponent,
     HistoryComponent,
-    ReportsComponent
+    ReportsComponent,
+    EmployeesComponent,
+    StatisticsComponent
   ],
    providers: [
 

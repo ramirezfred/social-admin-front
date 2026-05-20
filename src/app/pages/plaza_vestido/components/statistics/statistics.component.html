@@ -1,0 +1,359 @@
+<div>
+
+  <div *ngIf="userRole === 1" class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">
+        <i class="fa fa-filter mr-2"></i>
+        Filtros de Búsqueda
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="form-row">
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-bold">
+            <i class="fa fa-calendar mr-1"></i>
+            Semana (Viernes a Jueves)
+          </label>
+          <select 
+            class="form-control form-select"
+            [(ngModel)]="semanaSeleccionada"
+            (change)="onSemanaChange($event)">
+            <option *ngFor="let semana of semanas" [value]="semana.value">
+              {{ semana.label }}
+            </option>
+          </select>
+          <small class="text-muted">* Las semanas van de Viernes a Jueves</small>
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <label class="form-label fw-bold">
+            <i class="fa fa-user mr-1"></i>
+            Vendedor
+          </label>
+          <select
+            class="form-control" id="userIdSel" 
+            [(ngModel)]="userIdSel" 
+            (change)="onEmpleadoChange($event.target.value)">
+            <option value="1">Mis métricas (Admin)</option>
+            <option *ngFor="let emp of empleados" [value]="emp.id">
+              {{ emp.nombre }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <form [formGroup]="formFechas">
+            <div class="form-row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">
+                  <i class="fa fa-calendar-check-o mr-1"></i>
+                  Fecha Inicio
+                </label>
+                <input 
+                  type="date" 
+                  class="form-control"
+                  formControlName="fecha_inicio">
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">
+                  <i class="fa fa-calendar-check-o mr-1"></i>
+                  Fecha Fin
+                </label>
+                <input 
+                  type="date" 
+                  class="form-control"
+                  formControlName="fecha_fin">
+              </div>
+
+              
+            </div>
+          </form>
+        </div>
+
+        <div class="col-md-12 mb-3">
+          <div class="form-row justify-content-end">
+            <div class="col-auto">
+              <button 
+                type="button" 
+                class="btn btn-tn btn-primary"
+                (click)="aplicarFechasManuales()"
+                [disabled]="!formFechas.valid">
+                Aplicar
+              </button>
+            </div>
+            <div class="col-auto">
+              <button 
+                type="button" 
+                class="btn btn-tn btn-info"
+                (click)="limpiar()">
+                Limpiar
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="userRole !== 1" class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">
+        <i class="fa fa-filter mr-2"></i>
+        Filtros de Búsqueda
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="form-row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label fw-bold">
+            <i class="fa fa-calendar mr-1"></i>
+            Semana (Viernes a Jueves)
+          </label>
+          <select 
+            class="form-control form-select"
+            [(ngModel)]="semanaSeleccionada"
+            (change)="onSemanaChange($event)">
+            <option *ngFor="let semana of semanas" [value]="semana.value">
+              {{ semana.label }}
+            </option>
+          </select>
+          <small class="text-muted">* Las semanas van de Viernes a Jueves</small>
+        </div>
+
+        <div class="col-md-8">
+          <form [formGroup]="formFechas">
+            <div class="form-row">
+              <div class="col-md-5 mb-3">
+                <label class="form-label fw-bold">
+                  <i class="fa fa-calendar-check-o mr-1"></i>
+                  Fecha Inicio
+                </label>
+                <input 
+                  type="date" 
+                  class="form-control"
+                  formControlName="fecha_inicio">
+              </div>
+
+              <div class="col-md-5 mb-3">
+                <label class="form-label fw-bold">
+                  <i class="fa fa-calendar-check-o mr-1"></i>
+                  Fecha Fin
+                </label>
+                <input 
+                  type="date" 
+                  class="form-control"
+                  formControlName="fecha_fin">
+              </div>
+
+              <div class="col-md-2 mb-3 d-flex align-items-end">
+                <button 
+                  type="button" 
+                  class="btn btn-tn btn-primary w-100"
+                  (click)="aplicarFechasManuales()"
+                  [disabled]="!formFechas.valid">
+                  <!-- <i class="fa fa-search mr-1"></i> -->
+                  Aplicar
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2 text-muted">Cargando estadísticas...</p>
+  </div>
+
+  <div *ngIf="!loading && estadisticas !== null">
+
+    <div class="row" *ngIf="userRole === 1">
+      <div class="col-12">
+        <div class="card total-general shadow-sm">
+          <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">
+              <i class="fa fa-pie-chart mr-2"></i>
+              Resumen General <br>
+              <span class="small text-white-50" style="font-size: 0.75rem;">
+                Total acumulado de todos los usuarios
+              </span>
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                <p class="mb-2">
+                  <strong class="fs-5">Total Cotizaciones:</strong>
+                </p>
+                <h2 class="text-primary mb-0">
+                  {{ estadisticas.adelantado_general.cantidad + estadisticas.pagado_general.cantidad }}
+                </h2>
+              </div>
+              <div class="col-md-6 text-center text-md-end">
+                <p class="mb-2">
+                  <strong class="fs-5">Total General:</strong>
+                </p>
+                <h2 class="text-success mb-0">
+                  ${{ (estadisticas.adelantado_general.total + estadisticas.pagado_general.total) | number:'1.2-2' }}
+                </h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr><br>
+    <div class="row" *ngIf="userRole === 1">
+      <div class="col-12"> 
+        <div class="alert alert-info d-flex align-items-center" role="alert">
+          <!-- Icono de información o usuario -->
+          <i class="fa fa-info-circle mr-2" aria-hidden="true"></i> 
+          <div>
+            Visualizando resultados de: <strong>{{ userNombreSel }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="estadisticas && estadisticas.mejor_semana_historica" class="row mb-4">
+      <div class="col-12">
+        <div class="card bg-gradient-primary text-white shadow-lg">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h5 class="mb-2">
+                  <i class="fa fa-trophy mr-2"></i>
+                  Mejor Semana Histórica
+                </h5>
+                <p class="mb-1">
+                  <i class="fa fa-calendar-o mr-1"></i>
+                  {{ estadisticas.mejor_semana_historica.fecha_inicio | date:'dd/MM/yyyy' }} - 
+                  {{ estadisticas.mejor_semana_historica.fecha_fin | date:'dd/MM/yyyy' }}
+                </p>
+                <p class="mb-0">
+                  <i class="fa fa-bar-chart mr-1"></i>
+                  {{ estadisticas.mejor_semana_historica.cantidad }} cotizaciones
+                </p>
+              </div>
+              <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <h3 class="mb-0">
+                  ${{ estadisticas.mejor_semana_historica.total | number:'1.2-2' }}
+                </h3>
+                <small>Total acumulado</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-md-6 mb-3">
+        <div class="card bg-warning-soft border-warning h-100 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h6 class="text-warning mb-2">
+                  <i class="fa fa-clock-o mr-1"></i>
+                  ADELANTADO
+                </h6>
+                <h3 class="mb-0">{{ estadisticas.adelantado.cantidad }}</h3>
+                <small class="text-muted">Cotizaciones</small>
+              </div>
+              <div class="text-end">
+                <h5 class="mb-0 text-warning">
+                  ${{ estadisticas.adelantado.total | number:'1.2-2' }}
+                </h5>
+                <small class="text-muted">Total General</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <div class="card bg-success-soft border-success h-100 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h6 class="text-success mb-2">
+                  <i class="fa fa-check-circle-o mr-1"></i>
+                  PAGADO
+                </h6>
+                <h3 class="mb-0">{{ estadisticas.pagado.cantidad }}</h3>
+                <small class="text-muted">Cotizaciones</small>
+              </div>
+              <div class="text-end">
+                <h5 class="mb-0 text-success">
+                  ${{ estadisticas.pagado.total | number:'1.2-2' }}
+                </h5>
+                <small class="text-muted">Total</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <div class="card total-general shadow-sm">
+          <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">
+              <i class="fa fa-pie-chart mr-2"></i>
+              Resumen
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                <p class="mb-2">
+                  <strong class="fs-5">Total Cotizaciones:</strong>
+                </p>
+                <h2 class="text-primary mb-0">
+                  {{ estadisticas.adelantado.cantidad + estadisticas.pagado.cantidad }}
+                </h2>
+              </div>
+              <div class="col-md-6 text-center text-md-end">
+                <p class="mb-2">
+                  <strong class="fs-5">Total General:</strong>
+                </p>
+                <h2 class="text-success mb-0">
+                  ${{ (estadisticas.adelantado.total + estadisticas.pagado.total) | number:'1.2-2' }}
+                </h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+
+    <div class="row mt-3">
+      <div class="col-12">
+        <div class="alert alert-info d-flex align-items-center" role="alert">
+            <!-- Icono de información o usuario -->
+            <i class="fa fa-info-circle mr-2" aria-hidden="true"></i> 
+            <div>
+                <strong>Nota:</strong> Las estadísticas consideran cotizaciones con estado 
+                <strong>"En Curso"</strong> o <strong>"Finalizada"</strong>.
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

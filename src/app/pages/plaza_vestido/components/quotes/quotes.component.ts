@@ -11,9 +11,6 @@ import 'rxjs/add/operator/toPromise';
 
 import { SocialApiService } from '../../../../services/social/api/api.service';
 
-import { RutaBaseService } from '../../../../services/ruta-base/ruta-base.service';
-import { UploadService } from '../../../../services/upload-service/upload.service';
-
 import { Observable } from "rxjs/Observable";
 import { Subscription } from 'rxjs';
 
@@ -21,6 +18,37 @@ import { FormBuilder, FormArray, FormGroup, Validators, FormControl } from '@ang
 
 import { Subject } from 'rxjs/Subject'; // Ruta específica de RxJS 5.5
 import { takeUntil, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+
+import { SesionService } from '../../../../services/sesion/sesion.service';
+
+interface EstadisticasResponse {
+  pendiente_esta: {
+    cantidad: number;
+    total: number;
+  };
+  adelantado_esta: {
+    cantidad: number;
+    total: number;
+  };
+  pagado_esta: {
+    cantidad: number;
+    total: number;
+  };
+  adelantado_pasada: {
+    cantidad: number;
+    total: number;
+  };
+  pagado_pasada: {
+    cantidad: number;
+    total: number;
+  };
+  mejor_semana_historica: {
+    fecha_inicio: string;
+    fecha_fin: string;
+    cantidad: number;
+    total: number;
+  };
+}
 
 @Component({
   selector: 'app-quotes',
@@ -120,18 +148,35 @@ export class QuotesComponent implements OnInit, OnDestroy {
   formEntrega  = { tipo: '' };
   formFinalizar = { tipo_entrega: '' };
 
+  public empleados: any[] = []; // Cargar desde un servicio
+  public userIdSel: string; // Valor inicial
+  public userNombreSel: string; // Valor inicial
+
+  userId: any;
+  userRole = 0;
+
+  estadisticas: EstadisticasResponse | null = null;
+
   constructor(private modalService: NgbModal,
       private toasterService: ToasterService,
       private http: HttpClient,
-      private rutaService: RutaBaseService,
-      private uploadService:UploadService,
       private api_serv: SocialApiService,
       public fb: FormBuilder,
+      private sesion_serv: SesionService
   ) { 
+
+    this.userId = this.sesion_serv.getUserId();
+    this.userRole = this.sesion_serv.getUserRol();
+
+    this.userIdSel = ((this.sesion_serv.getUserId()) ? this.sesion_serv.getUserId() : 0).toString();
+
+    this.userNombreSel = this.sesion_serv.getUserNombre();
+
     this.crearFormulario(0);
 
     this.crearFormularioConcepto();
     this.crearListenersFormConcepto();
+
   }
 
   ngOnInit() {
@@ -291,9 +336,53 @@ export class QuotesComponent implements OnInit, OnDestroy {
   initComponent(){
     if(!this.bandera_init){
       this.bandera_init = true;
+      //Admin
+      if(this.userRole === 1){
+        this.getEmpleados();
+      }
       this.getListado();
       // this.getSuppliers();
     }
+  }
+
+  onEmpleadoChange(idEmpleado: string) {
+
+    if(idEmpleado === '1'){
+      this.userNombreSel = 'Admin';
+    }else{
+      const empleadoEncontrado = this.empleados.find((emp: any) => emp.id === Number(idEmpleado));
+
+      this.userNombreSel = empleadoEncontrado ? empleadoEncontrado.nombre : '';
+    }
+
+    this.getListado(); // Recarga la tabla con el filtro
+  }
+
+  limpiar(){
+    this.userIdSel = '1';
+    this.userNombreSel = 'Admin';
+    this.getListado(); // Recarga la tabla con el filtro
+  }
+
+  getEmpleados(): void {
+
+    this.empleados = [];
+    
+    var that = this;
+
+    this.api_serv.getQuery(`plaza_vestido/employees`)
+    .subscribe({
+      next(response : any) {
+        console.log(response);
+        that.empleados = response.data;
+
+      },
+      error(msg) {
+        console.log(msg);
+        that.tratarError(msg);
+      }
+    });
+
   }
 
   getListado(): void {
@@ -307,13 +396,15 @@ export class QuotesComponent implements OnInit, OnDestroy {
     
     var that = this;
 
-    this.api_serv.getQuery(`plaza_vestido/quotes?estado=en curso`)
+    this.api_serv.getQuery(`plaza_vestido/quotes?estado=en curso&user_id=${this.userIdSel}`)
     .subscribe({
       next(response : any) {
         console.log(response);
         that.listado = response.data;
         that.filteredItems = that.listado; 
         that.init();  
+
+        that.estadisticas = response.estadisticas;
         that.loading = false; 
 
         if(that.listado.length == 0){
@@ -900,6 +991,7 @@ export class QuotesComponent implements OnInit, OnDestroy {
     this.loading = true;
    
     var datos= {
+      user_id : this.sesion_serv.getUserId(),
       moneda : this.myForm.value.moneda,
       cliente : this.myForm.value.cliente,
       email : this.myForm.value.email,

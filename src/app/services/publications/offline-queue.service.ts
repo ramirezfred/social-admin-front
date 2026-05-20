@@ -68,6 +68,7 @@ export class OfflineQueueService {
 
   // ---- publicaciones_queue ----
   async encolarCreacion(formData: {
+    user_id: number,
     supplier_id: number,
     supplier_razon_social: string,
     texto: string,

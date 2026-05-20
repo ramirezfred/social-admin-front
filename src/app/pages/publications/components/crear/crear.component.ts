@@ -12,6 +12,8 @@ import { OfflineQueueService } from '../../../../services/publications/offline-q
 
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
+import { SesionService } from '../../../../services/sesion/sesion.service';
+
 @Component({
   selector: 'app-crear',
   templateUrl: './crear.component.html',
@@ -51,6 +53,8 @@ export class CrearComponent implements OnInit, OnDestroy {
 
   codigoGenerado: string = '';
 
+  userId: number | null = null;
+
   constructor(
     private toasterService: ToasterService,
     private publicationService: PublicationService,
@@ -58,11 +62,18 @@ export class CrearComponent implements OnInit, OnDestroy {
     private offlineQueue: OfflineQueueService,
     public fb: FormBuilder,
     private sanitizer: DomSanitizer,
+    private sesion_serv: SesionService,
   ) {
     this.crearFormularioDinamico();
   }
 
   ngOnInit() {
+    const usuarioId = this.sesion_serv.getUserId();
+
+    if(usuarioId){
+      this.userId = Number(usuarioId);
+    }
+
     this.sincronizarSuppliers();
   }
 
@@ -404,6 +415,12 @@ export class CrearComponent implements OnInit, OnDestroy {
       }
     } 
 
+    // Si userId es null o 0, entra en la validación
+    if (!this.userId) {
+      this.showToast('warning', 'Warning!', 'Usuario inválido, inicia sesión nuevamente.');
+      return;
+    }
+
     this.crear();
   }
 
@@ -411,17 +428,20 @@ export class CrearComponent implements OnInit, OnDestroy {
     this.loading = true;
 
     try {
+      let userId: number;
       let supplierId: number;
       let supplierRazonSocial: string;
       let texto: string;
 
-      if (this.modoDinamico) {
+      // if (this.modoDinamico) {
+        userId              = this.userId;
         supplierId          = Number(this.formDinamico.value.supplier_id);
         supplierRazonSocial = this.formDinamico.value.supplier_razon_social;
         texto               = this.generarTexto();
-      } 
+      // } 
 
       const resultado = await this.publicationService.crearConOffline(
+        userId,
         supplierId,
         supplierRazonSocial,
         texto,

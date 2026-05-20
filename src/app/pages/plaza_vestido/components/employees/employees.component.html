@@ -1,0 +1,184 @@
+
+<div>
+    <br>
+    <div class="row">
+        <div class="col-12" style="text-align: right">
+            <button style="display: inline-block;" type="button" class="btn btn-icon btn-tn btn-primary" 
+                title="Refresh" (click)="refreshTabla()"> 
+                    <i class="fa fa-refresh icon-refresh"></i>
+            </button>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-12" style="text-align: right">
+        <button style="display: inline-block;" type="button" class="btn btn-tn btn-primary" title="Crear" (click)="aCrear()">
+            Crear
+        </button>
+        </div>
+    </div>
+    <br>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">    
+                <div class="input-group">
+                    <input placeholder="Buscar..." class="form-control" type="text" id="inputSupplier" [(ngModel)]="inputTermino" (ngModelChange)="FilterByTermino()"/> 
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-12"> 
+        <div class="table-responsive">
+            <table class="table">
+            <thead>
+                <tr>
+                <!-- <th >ID</th> -->
+                <th >Nombre</th>
+                <th >Email</th>
+                <th >Status</th>
+                <th >Acciones</th>
+                </tr>
+            </thead>  
+            <tbody>
+                <tr *ngFor="let item of items; let i = index" >
+                    
+                <!-- <td >{{ item.id }}</td> -->
+                <td >{{ item.nombre ? item.nombre : '-' }}</td>
+                <td >{{ item.email ? item.email : '-' }}</td>
+                <td >
+                    <nb-checkbox [(ngModel)]="item.status" (change) = "ChangeStatus(item)" style="cursor:pointer;">
+                        <div *ngIf="!item.status">OFF</div>
+                        <div *ngIf="item.status">ON</div>
+                    </nb-checkbox>
+                </td>
+                <td >
+                    <button style="margin-top: 4px;" type="button" 
+                        class="btn btn-tn btn-primary" title="Editar" 
+                        (click)="aEditar(item, i)">
+                        Editar
+                    </button>
+                    <button style="background:#dc3545; color:#fff; margin-top: 4px;"
+                        type="button" class="btn btn-tn" title="Eliminar" 
+                        (click)="aEliminar(item, i)">
+                        Eliminar
+                    </button>
+                </td>
+                </tr>
+            </tbody>
+            </table>
+        </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-12"> 
+        <div class="btn-toolbar" role="toolbar" style="margin: 0;">
+            <div class="btn-group">
+            <label style="margin-top:10px">Página {{currentIndex}}/{{pageNumber}} </label>
+            </div>
+            <div class="btn-group pull-right">
+            <ul class="pagination" >
+                <li class="page-item" [ngClass]="{'disabled': (currentIndex == 1 || pageNumber == 0)}" ><a class="page-link"  (click)="prevPage()" >Atrás</a></li>
+                <li class="page-item" *ngFor="let page of pagesIndex"  [ngClass]="{'active': (currentIndex == page)}">
+                    <a class="page-link" (click)="setPage(page)"  >{{page}} </a>
+                </li>
+                <li class="page-item" [ngClass]="{'disabled': (currentIndex == pageNumber || pageNumber == 0)}" ><a class="page-link"   (click)="nextPage()" >Siguiente</a></li>
+            </ul>
+            </div>
+        </div> 
+        </div>
+    </div>
+</div>
+
+<ng-template #modalCrear id="modalCrear" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Vendedor</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <form autocomplete="off" [formGroup]="myForm">
+
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-control-label" for="input-nombre">Nombre</label>
+                    <input type="text" id="input-nombre" class="form-control" placeholder="Ej: Juan Pérez" formControlName="nombre" [class.is-invalid]="nombreNoValido">
+                    <small *ngIf="nombreNoValido" style="color: #dc3545 !important;">
+                        Campo requerido
+                    </small>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-control-label" for="input-email">Email</label>
+                    <input type="text" id="input-email" class="form-control" 
+                        placeholder="Email" formControlName="email" 
+                        [class.is-invalid]="emailNoValido" autocomplete="new-email">
+                    <small *ngIf="emailNoValido" style="color: #dc3545 !important;">
+                        Campo inválido
+                    </small>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-control-label" for="input-password">Password</label>
+                    <input type="password" id="input-password" class="form-control" 
+                        placeholder="Password" formControlName="password" 
+                        [class.is-invalid]="passwordNoValido" autocomplete="new-password">
+                    <small *ngIf="passwordNoValido" style="color: #dc3545 !important;">
+                        Campo inválido
+                    </small>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-control-label" for="input-password2">Confirmar Password</label>
+                    <input type="password" id="input-password2" class="form-control" 
+                        placeholder="Confirmar Password" formControlName="password2" 
+                        [class.is-invalid]="password2NoValido" autocomplete="new-password">
+                    <small *ngIf="password2NoValido" style="color: #dc3545 !important;">
+                        Las contraseñas no coinciden
+                    </small>
+                </div>
+            </div>
+        </div>
+
+    </form>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="guardar()">Aceptar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalEliminar id="modalEliminar" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Eliminar</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <p>
+      <strong>¿Realmente desea eliminar este Empleado?</strong>
+    </p>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="eliminar()">Aceptar</button>
+  </div>
+</ng-template>
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

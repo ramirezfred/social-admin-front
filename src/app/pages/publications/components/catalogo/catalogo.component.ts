@@ -19,6 +19,8 @@ import { takeUntil, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import { FormBuilder, FormArray, FormGroup, Validators, FormControl } from '@angular/forms';
 
+import { SesionService } from '../../../../services/sesion/sesion.service';
+
 @Component({
   selector: 'app-catalogo',
   templateUrl: './catalogo.component.html',
@@ -66,6 +68,7 @@ export class CatalogoComponent implements OnInit, OnDestroy {
       private http: HttpClient,
       private api_serv: SocialApiService,
       public fb: FormBuilder,
+      private sesion_serv: SesionService
   ) { 
     this.crearFormulario();
     this.crearListenersForm();
@@ -175,6 +178,9 @@ export class CatalogoComponent implements OnInit, OnDestroy {
     if (this.myForm.value.fecha_inicio) params.append('fecha_inicio', this.myForm.value.fecha_inicio);
     if (this.myForm.value.fecha_fin)    params.append('fecha_fin', this.myForm.value.fecha_fin);
     if (this.myForm.value.supplier_id)       params.append('supplier_id', this.myForm.value.supplier_id);
+
+    let userId = Number(this.sesion_serv.getUserId());
+    params.append('user_id', String(userId));
 
     this.api_serv.getQuery(`plaza_vestido/publications/crear/catalogo?${params.toString()}`)
     .subscribe({

@@ -53,8 +53,19 @@
                 <td >{{ item.email ? item.email : '-' }}</td>
                 <td >{{ item.telefono ? item.telefono : '-' }}</td>
                 <td >
-                    <button style="margin-top: 4px;" type="button" class="btn btn-tn btn-primary" title="Editar" (click)="aEditar(item, i)">Editar</button>
-                    <button style="margin-top: 4px;" type="button" class="btn btn-tn btn-primary" title="Eliminar" (click)="aEliminar(item, i)">Eliminar</button>
+                    <button *ngIf="userRole === 1"
+                        style="margin-top: 4px;" type="button" 
+                        class="btn btn-tn btn-primary" title="Editar" 
+                        (click)="aEditar(item, i)">
+                        Editar
+                    </button>
+                    <button *ngIf="userRole === 1"
+                        style="background:#dc3545; color:#fff; margin-top: 4px;" 
+                        type="button"
+                        class="btn btn-tn" title="Eliminar" 
+                        (click)="aEliminar(item, i)">
+                        Eliminar
+                    </button>
                 </td>
                 </tr>
             </tbody>

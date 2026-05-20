@@ -6,7 +6,7 @@ import { environment } from '../../../environments/environment';
 @Injectable()
 export class SupplierService {
 
-  private apiUrl = `${environment.apiUrl}/plaza_vestido/suppliers`;
+  private apiUrl = `${environment.apiUrl}/api/plaza_vestido/suppliers`;
   private dbName = 'publicaciones_db';
   private storeName = 'suppliers';
 

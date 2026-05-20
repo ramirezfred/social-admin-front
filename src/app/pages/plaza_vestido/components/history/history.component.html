@@ -9,7 +9,7 @@
     </div>
   </div>
   <br>
-  <div class="form-row"> 
+  <div class="form-row" *ngIf="userRole !== 1"> 
     <div class="col-md-2 offset-md-3 col-sm-12 form-group">
       <label for="selectedStartDate">Fecha inicial:</label>
       <input 
@@ -45,6 +45,55 @@
     </div>
 
   </div>
+  <div class="form-row" *ngIf="userRole === 1"> 
+    <div class="col-md-2 offset-md-1 col-sm-12 form-group">
+      <label for="selectedStartDate">Fecha inicial:</label>
+      <input 
+        type="date"
+        class="form-control" 
+        autocomplete="off" 
+        placeholder="Fecha inicial" 
+        [(ngModel)]="filtros.fecha_inicio"
+        id="selectedStartDate" 
+        required 
+      />
+    </div>
+
+    <div class="col-md-2 col-sm-12 form-group">
+      <label for="selectedEndDate">Fecha final:</label>
+      <input 
+        type="date"
+        class="form-control" 
+        autocomplete="off" 
+        placeholder="Fecha final" 
+        [(ngModel)]="filtros.fecha_fin"
+        id="selectedEndDate" 
+        required 
+      />
+    </div>
+
+    <div class="col-md-4 col-sm-12 form-group">
+      <label class="form-control-label" for="userIdSel">Vendedor:</label>
+      <select
+        class="form-control" id="userIdSel" 
+        [(ngModel)]="userIdSel" 
+        (change)="onEmpleadoChange($event.target.value)">
+        <option value="1">Mis Cotizaciones (Admin)</option>
+        <option *ngFor="let emp of empleados" [value]="emp.id">
+          {{ emp.nombre }}
+        </option>
+      </select>
+    </div>
+
+    <div class="col-md-2 col-sm-12 form-group d-flex align-items-end">
+      <button 
+        class="btn btn-primary btn-block btn-tn" 
+        (click)="getListado()">
+        Filtrar
+      </button>
+    </div>
+
+  </div>
   <br>
   <div class="container-fluid">
       <div class="row">
@@ -56,6 +105,17 @@
       </div>
   </div>
   <br>
+  <div class="row" *ngIf="userRole === 1">
+    <div class="col-12"> 
+      <div class="alert alert-info d-flex align-items-center" role="alert">
+        <!-- Icono de información o usuario -->
+        <i class="fa fa-info-circle mr-2" aria-hidden="true"></i> 
+        <div>
+          Visualizando resultados de: <strong>{{ userNombreSel }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="row">
     <div class="col-12"> 
       <div class="table-responsive">
@@ -202,7 +262,7 @@
 
   <form autocomplete="off" [formGroup]="myForm">
 
-    <div class="row">
+    <!-- <div class="row">
         <div class="col-md-4 col-sm-12">
             <div class="form-group">
                 <label class="form-control-label" for="moneda">Moneda</label>
@@ -216,7 +276,7 @@
                 </small>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <div class="row">
         <div class="col-md-4 col-sm-12">

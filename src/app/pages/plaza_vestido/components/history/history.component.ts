@@ -11,15 +11,14 @@ import 'rxjs/add/operator/toPromise';
 
 import { SocialApiService } from '../../../../services/social/api/api.service';
 
-import { RutaBaseService } from '../../../../services/ruta-base/ruta-base.service';
-import { UploadService } from '../../../../services/upload-service/upload.service';
-
 import { Observable } from "rxjs/Observable";
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs';
 
 import { FormBuilder, FormArray, FormGroup, Validators, FormControl } from '@angular/forms';
 import { color } from 'd3-color';
+
+import { SesionService } from '../../../../services/sesion/sesion.service';
 
 @Component({
   selector: 'app-history',
@@ -103,14 +102,28 @@ export class HistoryComponent implements OnInit {
     estado: 'finalizada',
   };
 
+  public empleados: any[] = []; // Cargar desde un servicio
+  public userIdSel: string; // Valor inicial
+  public userNombreSel: string; // Valor inicial
+
+  userId: any;
+  userRole = 0;
+
   constructor(private modalService: NgbModal,
       private toasterService: ToasterService,
       private http: HttpClient,
-      private rutaService: RutaBaseService,
-      private uploadService:UploadService,
       private api_serv: SocialApiService,
       public fb: FormBuilder,
+      private sesion_serv: SesionService,
   ) { 
+
+    this.userId = this.sesion_serv.getUserId();
+    this.userRole = this.sesion_serv.getUserRol();
+
+    this.userIdSel = ((this.sesion_serv.getUserId()) ? this.sesion_serv.getUserId() : 0).toString();
+
+    this.userNombreSel = this.sesion_serv.getUserNombre();
+
     this.crearFormulario(0);
   }
 
@@ -265,6 +278,10 @@ export class HistoryComponent implements OnInit {
     if(!this.bandera_init){
       this.setFechasPorDefecto();
       this.bandera_init = true;
+      //Admin
+      if(this.userRole === 1){
+        this.getEmpleados();
+      }
       this.getListado();
     }
   }
@@ -308,7 +325,49 @@ export class HistoryComponent implements OnInit {
     // return `${year}-${month}-${day}`;
   }
 
+  onEmpleadoChange(idEmpleado: string) {
+
+    // if(idEmpleado === '1'){
+    //   this.userNombreSel = 'Admin';
+    // }else{
+    //   const empleadoEncontrado = this.empleados.find((emp: any) => emp.id === Number(idEmpleado));
+
+    //   this.userNombreSel = empleadoEncontrado ? empleadoEncontrado.nombre : '';
+    // }
+
+    // this.getListado(); // Recarga la tabla con el filtro
+  }
+
+  getEmpleados(): void {
+
+    this.empleados = [];
+    
+    var that = this;
+
+    this.api_serv.getQuery(`plaza_vestido/employees`)
+    .subscribe({
+      next(response : any) {
+        console.log(response);
+        that.empleados = response.data;
+
+      },
+      error(msg) {
+        console.log(msg);
+        that.tratarError(msg);
+      }
+    });
+
+  }
+
   getListado(): void {
+
+    if(this.userIdSel === '1'){
+      this.userNombreSel = 'Admin';
+    }else{
+      const empleadoEncontrado = this.empleados.find((emp: any) => emp.id === Number(this.userIdSel));
+
+      this.userNombreSel = empleadoEncontrado ? empleadoEncontrado.nombre : '';
+    }
 
     this.listado = [];
     this.filteredItems = this.listado;
@@ -325,6 +384,7 @@ export class HistoryComponent implements OnInit {
     if (this.filtros.fecha_inicio) params.append('fecha_inicio', this.filtros.fecha_inicio);
     if (this.filtros.fecha_fin)    params.append('fecha_fin', this.filtros.fecha_fin);
     if (this.filtros.estado)       params.append('estado', this.filtros.estado);
+    if (true)                      params.append('user_id', this.userIdSel);
 
     this.api_serv.getQuery(`plaza_vestido/quotes?${params.toString()}`)
     .subscribe({

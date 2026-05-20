@@ -90,4 +90,30 @@
     border-color: #d35c25;
   }
 
+  /* Mejor semana */
+
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+  }
+
+  .card {
+    transition: transform 0.2s ease-in-out;
+    border-radius: 0.5rem;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+  }
+
+  .bg-gradient-primary .card-body {
+    padding: 1.5rem;
+  }
+
+  /* Estilos para mejorar la visualización de iconos */
+  .card-header i, 
+  .card-body i {
+    margin-right: 0.5rem;
+  }
+
 }

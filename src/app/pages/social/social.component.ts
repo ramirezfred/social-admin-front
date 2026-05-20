@@ -6,8 +6,6 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import 'rxjs/add/operator/toPromise';
 
-import { RutaBaseService } from '../../services/ruta-base/ruta-base.service';
-
 import { FormBuilder  } from '@angular/forms';
 
 import { ToasterService, ToasterConfig, Toast, BodyOutputType } from 'angular2-toaster';
@@ -17,8 +15,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Location } from '@angular/common';
 
-import { CotizacionesComponent } from './components/cotizaciones/cotizaciones.component';
-
 import { SocialUsuariosComponent } from './components-social/usuarios/usuarios.component';
 import { SocialPostsComponent } from './components-social/posts/posts.component';
 import { SocialSistemaComponent } from './components-social/sistema/sistema.component';
@@ -26,9 +22,6 @@ import { SocialMarcosComponent } from './components-social/marcos/marcos.compone
 import { SocialImagenesComponent } from './components-social/imagenes/imagenes.component';
 import { SocialPostGeneralComponent } from './components-social/post-general/post-general.component';
 
-import { BotUsuariosComponent } from './components-bot/usuarios/usuarios.component';
-import { BotConfigComponent } from './components-bot/config/config.component';
-import { BotSistemaComponent } from './components-bot/sistema/sistema.component';
 
 @Component({
   selector: 'social',
@@ -58,9 +51,6 @@ export class SocialComponent implements OnInit{
 	private data:any;
 	public loading = false;
 
-	//@ViewChildren(CotizacionesComponent) CotizacionesC: QueryList<CotizacionesComponent>;
-	@ViewChild(CotizacionesComponent) CotizacionesC: CotizacionesComponent;
-
 	selectedTab1 = true;
 	selectedTab2 = false;
 	selectedTab3 = false;
@@ -80,13 +70,6 @@ export class SocialComponent implements OnInit{
 	@ViewChild(SocialImagenesComponent) SocialImagenesC: SocialImagenesComponent;
 	@ViewChild(SocialPostGeneralComponent) SocialPostGeneralC: SocialPostGeneralComponent;
 
-	@ViewChild(BotUsuariosComponent) BotUsuariosC: BotUsuariosComponent;
-	@ViewChild(BotConfigComponent) BotConfigC: BotConfigComponent;
-	@ViewChild(BotSistemaComponent) BotSistemaC: BotSistemaComponent;
-
-	selectedTAB1 = true;
-	selectedTAB2 = false;
-
 	//panel bot
 	selectedTabB1 = true;
 	selectedTabB2 = false;
@@ -96,7 +79,6 @@ export class SocialComponent implements OnInit{
 	       private toasterService: ToasterService,
 	       private http: HttpClient,
 	       private router: Router,
-	       private rutaService: RutaBaseService,
 	       public fb: FormBuilder,
 		   private _location: Location,
 		   public nbspinnerservice:NbSpinnerService,
@@ -111,10 +93,6 @@ export class SocialComponent implements OnInit{
 		//this.themeService.changeTheme('cosmic');
 		this.themeService.changeTheme('default');
 
-		//this.CotizacionesC.first.getDataTipo1();
-		//this.CotizacionesC.getDataTipo1();
-
-		this.selectTAB(1);
 	}
 
 	private showToast(type: string, title: string, body: string) {
@@ -212,40 +190,6 @@ export class SocialComponent implements OnInit{
     }
 
   }
-
-  selectTAB(index){
-  	if(index == 1){
-      this.selectedTAB1 = true;
-      this.selectedTAB2 = false;
-    }else if(index == 2){
-      this.selectedTAB1 = false;
-      this.selectedTAB2 = true;
-    }
-
-  }
-
-  selectTabB(index){
-  	if(index == 1){
-      this.selectedTabB1 = true;
-      this.selectedTabB2 = false;
-			this.selectedTabB3 = false;
-      this.BotUsuariosC.initComponent();
-    }else if(index == 2){
-      this.selectedTabB1 = false;
-      this.selectedTabB2 = true;
-			this.selectedTabB3 = false;
-			this.BotConfigC.initComponent();
-    }else if(index == 3){
-      this.selectedTabB1 = false;
-      this.selectedTabB2 = false;
-			this.selectedTabB3 = true;
-			this.BotSistemaC.initComponent();
-    }
-
-  }
-
-
-
   
 
 }

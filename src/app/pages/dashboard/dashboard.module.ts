@@ -42,11 +42,8 @@ import { EchartsAreaStackComponent } from './echarts-mouvers/echarts-area-stack.
 import { EchartsBarAnimationComponent } from './echarts-mouvers/echarts-bar-animation.component';
 import { EchartsRadarComponent } from './echarts-mouvers/echarts-radar.component';
 
-import { MisComponentsModule } from '../../mis-components/mis-components.module';
-
 @NgModule({
   imports: [
-    MisComponentsModule,
     NgxChartsModule,
     ChartModule,
     ThemeModule,

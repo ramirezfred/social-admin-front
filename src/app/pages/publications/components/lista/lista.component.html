@@ -8,14 +8,32 @@
         (click)="refrescarModoAleatorio()">
         <i class="fa fa-refresh"></i>
       </button>
-      <!-- <button style="display: inline-block; margin-left: 8px;" type="button" class="btn btn-tn btn-info"
-        (click)="desactivarModoAleatorio()">
-        <i class="fa fa-list"></i> Ver listado
-      </button> -->
     </div>
   </div>
 
   <br>
+
+  <div class="form-row mb-3" *ngIf="userRole === 1">
+    <div class="col-md-4 offset-md-3 col-sm-12 form-group">
+      <label class="form-control-label" for="userIdSel">Filtrar por Vendedor:</label>
+      <select
+        class="form-control" id="userIdSel" 
+        [(ngModel)]="userIdSel" 
+        (change)="onEmpleadoChange($event.target.value)">
+        <option value="1">Mis Publicaciones (Admin)</option>
+        <option *ngFor="let emp of empleados" [value]="emp.id">
+          {{ emp.nombre }}
+        </option>
+      </select>
+    </div>
+    <div class="col-md-2 col-sm-12 form-group d-flex align-items-end">
+        <button 
+        class="btn btn-info btn-block btn-tn" 
+        (click)="limpiar()">
+        Limpiar
+        </button>
+    </div>
+  </div>
 
   <div *ngIf="publicacionActual">
 
@@ -54,7 +72,7 @@
         </button>
         <button type="button" class="btn btn-tn btn-success"
           style="margin-left: 8px; margin-top: 10px;"
-          [disabled]="compartiendo"
+          [disabled]="compartiendo || (userRole === 1 && userIdSel !== '1')"
           (click)="publicarAleatoria()">
           <i class="fa fa-whatsapp"></i>
           {{ compartiendo ? 'Compartiendo...' : 'Publicar en WhatsApp' }}
@@ -64,154 +82,6 @@
 
   </div>
 </div>
-
-<!-- LISTADO NORMAL -->
-<div *ngIf="!modoAleatorio">
-  <br>
-  <div class="col-12" style="text-align: right">
-    <button style="display: inline-block;" type="button" class="btn btn-tn btn-success"
-      style="margin-left: 8px;"
-      title="Modo aleatorio"
-      (click)="activarModoAleatorio()">
-      <i class="fa fa-random"></i> Modo aleatorio
-    </button>
-  </div>
-  <br>
-  <div class="row">
-    <div class="col-12" style="text-align: right">
-      <button type="button" style="display: inline-block;" class="btn btn-icon btn-tn btn-primary"
-        title="Refresh" (click)="getListado()">
-        <i class="fa fa-refresh"></i>
-      </button>
-    </div>
-  </div>
-
-  <br>
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-12">
-        <div class="input-group">
-          <input placeholder="Buscar por proveedor o texto..."
-            class="form-control" type="text"
-            [(ngModel)]="inputTermino"
-            (ngModelChange)="FilterByTermino()"/>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <br>
-  <div class="row">
-    <div class="col-12">
-      <div class="table-responsive mi-tabla-movil">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Proveedor</th>
-              <th>Texto</th>
-              <th>Imágenes</th>
-              <th>Fecha</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of items">
-              <td data-titulo="Prov.">{{ item.supplier?.razon_social }}</td>
-              <td data-titulo="Texto" class="truncate-text" title="{{ item.texto }}">
-                {{ item.texto }}
-              </td>
-              <td data-titulo="Imgs.">{{ item.images?.length }}</td>
-              <td data-titulo="Fecha">{{ item.created_at | date:'dd/MM/yyyy' }}</td>
-              <td>
-                <button type="button" class="btn btn-tn btn-primary"
-                  title="Previsualizar y publicar"
-                  (click)="abrirModalPrevisualizar(item, modalPrevisualizar)"
-                  style="margin-top: 4px;">
-                  <i class="fa fa-eye"></i> Ver
-                </button>
-                <button type="button" class="btn btn-tn btn-danger"
-                  title="Eliminar"
-                  style="margin-left: 4px; margin-top: 4px;"
-                  (click)="abrirModalEliminar(item, modalEliminar)">
-                  <i class="fa fa-trash"></i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <br>
-  <div class="row">
-    <div class="col-12">
-      <div class="btn-toolbar" role="toolbar" style="margin: 0;">
-        <div class="btn-group">
-          <label style="margin-top:10px">Página {{currentIndex}}/{{pageNumber}}</label>
-        </div>
-        <div class="btn-group pull-right">
-          <ul class="pagination">
-            <li class="page-item" [ngClass]="{'disabled': (currentIndex == 1 || pageNumber == 0)}">
-              <a class="page-link" (click)="prevPage()">Atrás</a>
-            </li>
-            <li class="page-item" *ngFor="let page of pagesIndex"
-              [ngClass]="{'active': (currentIndex == page)}">
-              <a class="page-link" (click)="setPage(page)">{{page}}</a>
-            </li>
-            <li class="page-item" [ngClass]="{'disabled': (currentIndex == pageNumber || pageNumber == 0)}">
-              <a class="page-link" (click)="nextPage()">Siguiente</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL PREVISUALIZAR -->
-<ng-template #modalPrevisualizar let-c="close" let-d="dismiss">
-  <div class="modal-header">
-    <h4 class="modal-title">Previsualizar publicación</h4>
-    <button type="button" class="close" (click)="d('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body" *ngIf="modalPrevisualizarVisible">
-
-    <div class="row">
-      <div class="col-12">
-        <strong>Proveedor:</strong> {{ selectObj?.supplier?.razon_social }}
-      </div>
-    </div>
-    <br>
-    <div class="row">
-      <div class="col-12">
-        <strong>Texto:</strong>
-        <p style="white-space: pre-line;">{{ selectObj?.texto }}</p>
-      </div>
-    </div>
-    <br>
-    <div class="row">
-      <div *ngFor="let img of selectObj?.images" class="col-3" style="margin-bottom: 10px;">
-        <img [src]="img.url" style="width: 100%; border-radius: 4px;">
-      </div>
-    </div>
-
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-tn btn-secondary"
-      (click)="c('Close click'); cerrarModalPrevisualizar()">
-      Cerrar
-    </button>
-    <button type="button" class="btn btn-tn btn-success"
-      [disabled]="compartiendo"
-      (click)="publicar()">
-      <i class="fa fa-whatsapp"></i>
-      {{ compartiendo ? 'Compartiendo...' : 'Publicar en WhatsApp' }}
-    </button>
-  </div>
-</ng-template>
 
 <!-- MODAL ELIMINAR -->
 <ng-template #modalEliminar let-c="close" let-d="dismiss">

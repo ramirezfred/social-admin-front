@@ -6,12 +6,14 @@
   <div class="logo-containter">
     <a (click)="toggleSidebar()" href="#" class="navigation"><i class="nb-menu"></i></a>
     <!-- <div class="logo" (click)="salir()"><span><img src="assets/images/thumbnail_goopy.png" alt="" height="50px" width="auto" style="display:block; margin:auto"/></span></div> -->
-    <div class="logo" (click)="salir()"><span><img src="assets/images/LogoInterNow.png" alt="" height="50px" width="auto" style="display:block; margin:auto"/></span></div>
+    <div class="logo" (click)="salir()">
+      <span>
+        <img src="assets/images/LogoInterNow.png" alt="" class="logo-img"/>
+      </span>
+    </div>
   </div>
   <!-- <ngx-theme-switcher></ngx-theme-switcher> -->
 </div>
-
-<toaster-container [toasterconfig]="config"></toaster-container>
 
 <nb-actions
   size="medium"
