@@ -47,7 +47,9 @@
       <div class="row">
           <div class="col-12">    
               <div class="input-group">
-                  <input placeholder="Buscar..." class="form-control" type="text" id="inputQuote" [(ngModel)]="inputTermino" (ngModelChange)="FilterByTermino()"/> 
+                  <input placeholder="Buscar..." class="form-control" 
+                    type="text" id="inputQuote" [(ngModel)]="inputTermino" 
+                    (ngModelChange)="FilterByTermino()" autocomplete="new-buscar"/> 
               </div>
           </div>
       </div>
@@ -777,12 +779,23 @@
         <span><strong>Seleccionado:</strong> {{ formEntrega.tipo | titlecase }}</span>
       </div>
 
+      <div class="row" *ngIf="formEntrega.tipo === 'envio'">
+        <div class="col-12" style="margin-top:14px;">
+          <label class="form-control-label">Costo de Guía</label>
+          <input type="number" 
+            [(ngModel)]="formEntrega.costo_guia" 
+            class="form-control"
+            min="0.01"
+            placeholder="0.00">
+        </div>
+      </div>
+
     </div>
 
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click'); cerrarModalTipoEntrega()">Cancelar</button>
-    <button type="button" class="btn btn-tn btn-danger" (click)="confirmarTipoEntrega()" [disabled]="!formEntrega.tipo">Confirmar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="confirmarTipoEntrega()" [disabled]="!formEntrega.tipo || (formEntrega.tipo === 'envio' && (!formEntrega.costo_guia || formEntrega.costo_guia <= 0))">Confirmar</button>
   </div>
 </ng-template>
 
@@ -801,6 +814,9 @@
       <ng-container *ngIf="cotizacionSeleccionada?.tipo_entrega; else asignarEntrega">
         <p>Tipo de entrega asignado: 
           <strong>{{ cotizacionSeleccionada?.tipo_entrega | titlecase }}</strong>
+        </p>
+        <p *ngIf="cotizacionSeleccionada?.tipo_entrega === 'envio'">Costo de Guía: 
+          <strong>{{ cotizacionSeleccionada?.costo_guia | currency:'MXN' }}</strong>
         </p>
         <p>¿Confirmas finalizar esta cotización?</p>
       </ng-container>
@@ -829,6 +845,17 @@
         <div *ngIf="formFinalizar.tipo_entrega">
           <span><strong>Seleccionado:</strong> {{ formFinalizar.tipo_entrega | titlecase }}</span>
         </div>
+
+        <div class="row" *ngIf="formFinalizar.tipo_entrega === 'envio'">
+          <div class="col-12" style="margin-top:14px;">
+            <label class="form-control-label">Costo de Guía</label>
+            <input type="number" 
+              [(ngModel)]="formFinalizar.costo_guia" 
+              class="form-control"
+              min="0.01"
+              placeholder="0.00">
+          </div>
+        </div>
       </ng-template>
 
     </div>
@@ -836,7 +863,7 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click'); cerrarModalFinalizar()">Cerrar</button>
-    <button type="button" class="btn btn-tn btn-danger" (click)="confirmarFinalizar()" [disabled]="!cotizacionSeleccionada?.tipo_entrega && !formFinalizar.tipo_entrega">Finalizar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="confirmarFinalizar()" [disabled]="!cotizacionSeleccionada?.tipo_entrega && !formFinalizar.tipo_entrega || (formFinalizar.tipo_entrega === 'envio' && (!formFinalizar.costo_guia || formFinalizar.costo_guia <= 0))">Finalizar</button>
   </div>
 </ng-template>
 

@@ -1,0 +1,350 @@
+
+<div style="display:flex; gap:12px; margin: 16px 0;">
+    <button 
+        (click)="formLista.tipo = 'gastos'"
+        [ngClass]="formLista.tipo === 'gastos' ? 'btn-primary' : 'btn-secondary'"
+        style="flex:1;"
+        class="btn btn-tn">
+        <i class="fa fa-money" aria-hidden="true"></i> Gastos
+    </button>
+
+    <button 
+        (click)="formLista.tipo = 'nomina'; initComponent2();"
+        [ngClass]="formLista.tipo === 'nomina' ? 'btn-primary' : 'btn-secondary'"
+        style="flex:1;"
+        class="btn btn-tn">
+        <i class="fa fa-id-card-o" aria-hidden="true"></i> Nómina
+    </button>
+</div>
+
+<div *ngIf="formLista.tipo === 'gastos'">
+    <br>
+    <div class="row">
+        <div class="col-12" style="text-align: right">
+            <button style="display: inline-block;" type="button" class="btn btn-icon btn-tn btn-primary" 
+                title="Refresh" (click)="refreshTabla()"> 
+                    <i class="fa fa-refresh icon-refresh"></i>
+            </button>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-12" style="text-align: right">
+        <button style="display: inline-block;" type="button" class="btn btn-tn btn-primary" title="Crear" (click)="aCrear()">
+            Crear
+        </button>
+        </div>
+    </div>
+    <br>
+    <div class="form-row"> 
+        <div class="col-md-2 offset-md-3 col-sm-12 form-group">
+            <label for="selectedStartDate">Fecha inicial:</label>
+            <input 
+                type="date"
+                class="form-control" 
+                autocomplete="off" 
+                placeholder="Fecha inicial" 
+                [(ngModel)]="filtros.fecha_inicio"
+                id="selectedStartDate" 
+                required 
+            />
+        </div>
+
+        <div class="col-md-2 col-sm-12 form-group">
+            <label for="selectedEndDate">Fecha final:</label>
+            <input 
+                type="date"
+                class="form-control" 
+                autocomplete="off" 
+                placeholder="Fecha final" 
+                [(ngModel)]="filtros.fecha_fin"
+                id="selectedEndDate" 
+                required 
+            />
+        </div>
+
+        <div class="col-md-2 col-sm-12 form-group d-flex align-items-end">
+            <button 
+                class="btn btn-primary btn-block btn-tn" 
+                (click)="getListado()">
+                Filtrar
+            </button>
+        </div>
+
+    </div>
+    <br>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">    
+                <div class="input-group">
+                    <input placeholder="Buscar..." class="form-control" type="text" id="inputSupplier" [(ngModel)]="inputTermino" (ngModelChange)="FilterByTermino()"/> 
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-12"> 
+        <div class="table-responsive">
+            <table class="table">
+            <thead>
+                <tr>
+                <th >Fecha</th>
+                <th >Monto</th>
+                <th >Concepto</th>
+                <th >Acciones</th>
+                </tr>
+            </thead>  
+            <tbody>
+                <tr *ngFor="let item of items; let i = index" >
+                    
+                <td >{{ item.fecha }}</td>
+                <td >{{ item.monto }}</td>
+                <td class="truncate-text" title="{{ item.concepto }}">{{ item.concepto }}</td>
+                <td >
+                    <button
+                        style="margin-top: 4px;" type="button" 
+                        class="btn btn-tn btn-primary" title="Editar" 
+                        (click)="aEditar(item, i)">
+                        Editar
+                    </button>
+                    <button
+                        style="background:#dc3545; color:#fff; margin-top: 4px;" 
+                        type="button"
+                        class="btn btn-tn" title="Eliminar" 
+                        (click)="aEliminar(item, i)">
+                        Eliminar
+                    </button>
+                </td>
+                </tr>
+            </tbody>
+            </table>
+        </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-12"> 
+        <div class="btn-toolbar" role="toolbar" style="margin: 0;">
+            <div class="btn-group">
+            <label style="margin-top:10px">Página {{currentIndex}}/{{pageNumber}} </label>
+            </div>
+            <div class="btn-group pull-right">
+            <ul class="pagination" >
+                <li class="page-item" [ngClass]="{'disabled': (currentIndex == 1 || pageNumber == 0)}" ><a class="page-link"  (click)="prevPage()" >Atrás</a></li>
+                <li class="page-item" *ngFor="let page of pagesIndex"  [ngClass]="{'active': (currentIndex == page)}">
+                    <a class="page-link" (click)="setPage(page)"  >{{page}} </a>
+                </li>
+                <li class="page-item" [ngClass]="{'disabled': (currentIndex == pageNumber || pageNumber == 0)}" ><a class="page-link"   (click)="nextPage()" >Siguiente</a></li>
+            </ul>
+            </div>
+        </div> 
+        </div>
+    </div>
+</div>
+
+<div *ngIf="formLista.tipo === 'nomina'">
+    <br>
+    <div class="row">
+        <div class="col-12" style="text-align: right">
+            <button style="display: inline-block;" type="button" class="btn btn-icon btn-tn btn-primary" 
+                title="Refresh" (click)="refreshTabla2()"> 
+                    <i class="fa fa-refresh icon-refresh"></i>
+            </button>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-12" style="text-align: right">
+        <button style="display: inline-block;" type="button" class="btn btn-tn btn-primary" title="Crear" (click)="aCrear()">
+            Crear
+        </button>
+        </div>
+    </div>
+    <br>
+    <div class="form-row"> 
+        <div class="col-md-2 offset-md-3 col-sm-12 form-group">
+            <label for="selectedStartDate2">Fecha inicial:</label>
+            <input 
+                type="date"
+                class="form-control" 
+                autocomplete="off" 
+                placeholder="Fecha inicial" 
+                [(ngModel)]="filtros2.fecha_inicio"
+                id="selectedStartDate2" 
+                required 
+            />
+        </div>
+
+        <div class="col-md-2 col-sm-12 form-group">
+            <label for="selectedEndDate2">Fecha final:</label>
+            <input 
+                type="date"
+                class="form-control" 
+                autocomplete="off" 
+                placeholder="Fecha final" 
+                [(ngModel)]="filtros2.fecha_fin"
+                id="selectedEndDate2" 
+                required 
+            />
+        </div>
+
+        <div class="col-md-2 col-sm-12 form-group d-flex align-items-end">
+            <button 
+                class="btn btn-primary btn-block btn-tn" 
+                (click)="getListado2()">
+                Filtrar
+            </button>
+        </div>
+
+    </div>
+    <br>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">    
+                <div class="input-group">
+                    <input placeholder="Buscar..." class="form-control" type="text" id="inputSupplier2" [(ngModel)]="inputTermino2" (ngModelChange)="FilterByTermino2()"/> 
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-12"> 
+        <div class="table-responsive">
+            <table class="table">
+            <thead>
+                <tr>
+                <th>Fecha</th>
+                <th>Monto</th>
+                <th>Concepto</th>
+                <th>Acciones</th>
+                </tr>
+            </thead>  
+            <tbody>
+                <tr *ngFor="let item of items2; let i = index">
+                    
+                <td>{{ item.fecha }}</td>
+                <td>{{ item.monto }}</td>
+                <td class="truncate-text" title="{{ item.concepto }}">{{ item.concepto }}</td>
+                <td>
+                    <button
+                        style="margin-top: 4px;" type="button" 
+                        class="btn btn-tn btn-primary" title="Editar" 
+                        (click)="aEditar(item, i)">
+                        Editar
+                    </button>
+                    <button
+                        style="background:#dc3545; color:#fff; margin-top: 4px;" 
+                        type="button"
+                        class="btn btn-tn" title="Eliminar" 
+                        (click)="aEliminar(item, i)">
+                        Eliminar
+                    </button>
+                </td>
+                </tr>
+            </tbody>
+            </table>
+        </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-12"> 
+        <div class="btn-toolbar" role="toolbar" style="margin: 0;">
+            <div class="btn-group">
+            <label style="margin-top:10px">Página {{currentIndex2}}/{{pageNumber2}} </label>
+            </div>
+            <div class="btn-group pull-right">
+            <ul class="pagination">
+                <li class="page-item" [ngClass]="{'disabled': (currentIndex2 == 1 || pageNumber2 == 0)}"><a class="page-link" (click)="prevPage2()">Atrás</a></li>
+                <li class="page-item" *ngFor="let page of pagesIndex2" [ngClass]="{'active': (currentIndex2 == page)}">
+                    <a class="page-link" (click)="setPage2(page)">{{page}} </a>
+                </li>
+                <li class="page-item" [ngClass]="{'disabled': (currentIndex2 == pageNumber2 || pageNumber2 == 0)}"><a class="page-link" (click)="nextPage2()">Siguiente</a></li>
+            </ul>
+            </div>
+        </div> 
+        </div>
+    </div>
+</div>
+
+<ng-template #modalCrear id="modalCrear" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">{{ formLista.tipo === 'gastos' ? 'Gasto' : 'Nómina' }} </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <form autocomplete="off" [formGroup]="myForm">
+
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-control-label" for="input-fecha">Fecha</label>
+                    <input type="date" id="input-fecha" class="form-control" formControlName="fecha" [class.is-invalid]="fechaNoValido">
+                    <small *ngIf="fechaNoValido" style="color: #dc3545 !important;">
+                        Campo inválido
+                    </small>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-control-label" for="input-monto">Monto</label>
+                    <input type="number" id="input-monto" 
+                    class="form-control" placeholder="Ej: 100.00" 
+                    formControlName="monto" [class.is-invalid]="montoNoValido">
+                    <small *ngIf="montoNoValido" style="color: #dc3545 !important;">
+                        Campo inválido
+                    </small>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-control-label" for="input-concepto">Concepto</label>
+                    <input type="text" id="input-concepto" class="form-control" 
+                        [placeholder]="formLista.tipo === 'gastos' ? 'Ej: Compra de materiales' : 'Ej: Pago de nómina quincenal'" 
+                        formControlName="concepto" [class.is-invalid]="conceptoNoValido">
+                    <small *ngIf="conceptoNoValido" style="color: #dc3545 !important;">
+                        Campo inválido
+                    </small>
+                </div>
+            </div>  
+        </div>
+
+    </form>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="guardar()">Aceptar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalEliminar id="modalEliminar" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Eliminar</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <p>
+      <strong>¿Realmente desea eliminar este Registro?</strong>
+    </p>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-tn btn-danger" (click)="eliminar()">Aceptar</button>
+  </div>
+</ng-template>
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

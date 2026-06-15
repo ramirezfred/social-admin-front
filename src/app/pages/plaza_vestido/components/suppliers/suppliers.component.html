@@ -66,6 +66,12 @@
                         (click)="aEliminar(item, i)">
                         Eliminar
                     </button>
+                    <button *ngIf="userRole === 1"
+                        style="margin-top: 4px; background: #555;" type="button" 
+                        class="btn btn-tn" title="Ver Detalle Semanal" 
+                        (click)="getGenerado(item, i)">
+                        Detalle Semanal
+                    </button>
                 </td>
                 </tr>
             </tbody>
@@ -188,6 +194,146 @@
   <div class="modal-footer">
     <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
     <button type="button" class="btn btn-tn btn-danger" (click)="eliminar()">Aceptar</button>
+  </div>
+</ng-template>
+
+<!-- Modal Generado -->
+<ng-template #modalGenerado id="modalGenerado" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">{{ selectObj?.razon_social }}</h4>
+    <button type="button" class="close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+
+    <div class="form-row">
+        <div class="col-md-4 mb-3">
+        <label class="form-label fw-bold">
+            <i class="fa fa-calendar mr-1"></i>
+            Semana (Viernes a Jueves)
+        </label>
+        <select 
+            class="form-control form-select"
+            [(ngModel)]="semanaSeleccionada"
+            (change)="onSemanaChange($event)">
+            <option *ngFor="let semana of semanas" [value]="semana.value">
+            {{ semana.label }}
+            </option>
+        </select>
+        <small class="text-muted">* Las semanas van de Viernes a Jueves</small>
+        </div>
+
+        <div class="col-md-8">
+        <form [formGroup]="formFechas">
+            <div class="form-row">
+            <div class="col-md-5 mb-3">
+                <label class="form-label fw-bold">
+                <i class="fa fa-calendar-check-o mr-1"></i>
+                Fecha Inicio
+                </label>
+                <input 
+                type="date" 
+                class="form-control"
+                formControlName="fecha_inicio">
+            </div>
+
+            <div class="col-md-5 mb-3">
+                <label class="form-label fw-bold">
+                <i class="fa fa-calendar-check-o mr-1"></i>
+                Fecha Fin
+                </label>
+                <input 
+                type="date" 
+                class="form-control"
+                formControlName="fecha_fin">
+            </div>
+
+            <div class="col-md-2 mb-3 d-flex align-items-end">
+                <button 
+                type="button" 
+                class="btn btn-tn btn-primary w-100"
+                (click)="aplicarFechasManuales()"
+                [disabled]="!formFechas.valid"
+                title="Aplicar">
+                    <i class="fa fa-search mr-1"></i>
+                
+                </button>
+            </div>
+            </div>
+        </form>
+        </div>
+    </div>
+
+    <div *ngIf="loading" class="text-center py-5 mt-3">
+        <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-2 text-muted">Cargando resumen...</p>
+    </div>
+
+    <div class="row mt-3" *ngIf="!loading && estadisticas === null">
+      <div class="col-12"> 
+        <div class="alert alert-info d-flex align-items-center" role="alert">
+          <!-- Icono de información o usuario -->
+          <i class="fa fa-info-circle mr-2" aria-hidden="true"></i> 
+          <div>
+            No hay órdenes <strong>Pagadas</strong> en el período seleccionado.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-3" *ngIf="!loading && estadisticas !== null">
+        <div class="col-12 mb-3"> 
+            <h5>
+              Resumen General <br>
+              <span class="small text-white-50" style="font-size: 0.75rem;">
+                {{ estadisticas.razon_social }}
+              </span>
+            </h5>
+        </div>
+        <div class="col-12 mb-3"> 
+            <div class="alert alert-info d-flex align-items-center" role="alert">
+                <!-- Icono de información o usuario -->
+                <i class="fa fa-info-circle mr-2" aria-hidden="true"></i> 
+                <div>
+                    El resumen se calcula sobre las órdenes <strong>Pagadas</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-center mb-3 mb-md-0">
+            <p class="mb-2">
+            <strong class="fs-5">Total Bruto Vendido:</strong>
+            </p>
+            <h2 class="text-primary mb-0">
+                ${{ estadisticas.total_vendido | number:'1.2-2' }}
+            </h2>
+        </div>
+        <div class="col-md-4 text-center mb-3 mb-md-0">
+            <p class="mb-2">
+            <strong class="fs-5">Comisión Retenida (10%):</strong>
+            </p>
+            <h2 class="text-success mb-0">
+            ${{ (estadisticas.total_vendido - estadisticas.total_deuda) | number:'1.2-2' }}
+            </h2>
+        </div>
+        <div class="col-md-4 text-center mb-3 mb-md-0">
+            <p class="mb-2">
+            <strong class="fs-5">Total Neto:</strong>
+            </p>
+            <h2 class="text-primary mb-0">
+                ${{ estadisticas.total_deuda | number:'1.2-2' }}
+            </h2>
+        </div>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click');">Atrás</button>
+    <!-- <button type="button" class="btn btn-tn btn-danger">
+      Aceptar
+    </button> -->
   </div>
 </ng-template>
 

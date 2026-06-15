@@ -12,6 +12,8 @@ import { HistoryComponent } from './components/history/history.component';
 import { ReportsComponent } from './components/reports/reports.component';
 import { EmployeesComponent }   from './components/employees/employees.component';
 import { StatisticsComponent } from './components/statistics/statistics.component';
+import { ExpensesAndPayrollComponent } from './components/expenses-and-payroll/expenses-and-payroll.component';
+import { CashClosesComponent } from './components/cash-closes/cash-closes.component';
 
 @NgModule({
   imports: [
@@ -35,7 +37,9 @@ import { StatisticsComponent } from './components/statistics/statistics.componen
     HistoryComponent,
     ReportsComponent,
     EmployeesComponent,
-    StatisticsComponent
+    StatisticsComponent,
+    ExpensesAndPayrollComponent,
+    CashClosesComponent
   ],
    providers: [
 

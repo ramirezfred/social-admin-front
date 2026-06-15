@@ -72,7 +72,7 @@
         </button>
         <button type="button" class="btn btn-tn btn-success"
           style="margin-left: 8px; margin-top: 10px;"
-          [disabled]="compartiendo || (userRole === 1 && userIdSel !== '1')"
+          [disabled]="compartiendo"
           (click)="publicarAleatoria()">
           <i class="fa fa-whatsapp"></i>
           {{ compartiendo ? 'Compartiendo...' : 'Publicar en WhatsApp' }}

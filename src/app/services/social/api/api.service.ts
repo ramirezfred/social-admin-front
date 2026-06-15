@@ -176,4 +176,19 @@ export class SocialApiService {
     return this.http.put(url, datos, httpOptions);
   }
 
+  getQueryUser( query : string, token : string ){
+    
+    const url = this.api_base + query;
+
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Authorization' : 'Bearer '+token,
+      })
+    };
+    
+    //console.log('token serv '+this.getToken()); 
+
+    return this.http.get(url, httpOptions);
+  }
+
 }

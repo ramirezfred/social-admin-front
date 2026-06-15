@@ -62,6 +62,15 @@ export class CatalogoComponent implements OnInit, OnDestroy {
   // Crear el Subject de control
   private destroy$: Subject<boolean> = new Subject<boolean>();
 
+  public empleados: any[] = []; // Cargar desde un servicio
+  public userIdSel: string; // Valor inicial
+  public userNombreSel: string; // Valor inicial
+
+  userId: any;
+  userRole = 0;
+
+  bandera_init = false;
+
   constructor(
       private modalService: NgbModal,
       private toasterService: ToasterService,
@@ -70,6 +79,14 @@ export class CatalogoComponent implements OnInit, OnDestroy {
       public fb: FormBuilder,
       private sesion_serv: SesionService
   ) { 
+
+    this.userId = this.sesion_serv.getUserId();
+    this.userRole = this.sesion_serv.getUserRol();
+
+    this.userIdSel = ((this.sesion_serv.getUserId()) ? this.sesion_serv.getUserId() : 0).toString();
+
+    this.userNombreSel = this.sesion_serv.getUserNombre();
+
     this.crearFormulario();
     this.crearListenersForm();
   }
@@ -122,6 +139,16 @@ export class CatalogoComponent implements OnInit, OnDestroy {
         this.showToast('error', 'Erro!', errorMsg);
     }
 
+  }
+
+  initComponent(){
+    if(!this.bandera_init){
+      this.bandera_init = true;
+      //Admin
+      if(this.userRole === 1){
+        this.getEmpleados();
+      }
+    }
   }
 
   setFechasPorDefecto() {
@@ -177,10 +204,12 @@ export class CatalogoComponent implements OnInit, OnDestroy {
     // Solo agrega al query string si el filtro tiene valor
     if (this.myForm.value.fecha_inicio) params.append('fecha_inicio', this.myForm.value.fecha_inicio);
     if (this.myForm.value.fecha_fin)    params.append('fecha_fin', this.myForm.value.fecha_fin);
-    if (this.myForm.value.supplier_id)       params.append('supplier_id', this.myForm.value.supplier_id);
+    if (this.myForm.value.supplier_id)  params.append('supplier_id', this.myForm.value.supplier_id);
 
-    let userId = Number(this.sesion_serv.getUserId());
-    params.append('user_id', String(userId));
+    let userId = Number(this.myForm.value.user_id);
+    if(userId !== 0){
+      params.append('user_id', String(userId));
+    }
 
     this.api_serv.getQuery(`plaza_vestido/publications/crear/catalogo?${params.toString()}`)
     .subscribe({
@@ -211,7 +240,8 @@ export class CatalogoComponent implements OnInit, OnDestroy {
       supplier_id  : [''],
       supplier_razon_social  : [''],
       fecha_inicio: ['', Validators.required], 
-      fecha_fin: ['', Validators.required]    
+      fecha_fin: ['', Validators.required],
+      user_id: [this.userIdSel, Validators.required]
 
     }); 
   
@@ -286,12 +316,47 @@ export class CatalogoComponent implements OnInit, OnDestroy {
 
     this.suppliersFiltrados = [];
 
-    this.myForm.patchValue({
-      supplier_id: '',
-      supplier_razon_social: ''
-    }, { emitEvent: false }); // importante
+    if(this.userRole === 1){ // admin
+
+      this.myForm.patchValue({
+        supplier_id: '',
+        supplier_razon_social: '',
+        user_id: '1' // por defecto admin
+      }, { emitEvent: false }); // importante
+
+    }else{ // vendedor
+
+      this.myForm.patchValue({
+        supplier_id: '',
+        supplier_razon_social: ''
+      }, { emitEvent: false }); // importante
+
+    }
 
     this.showDropdown = false;
+  }
+
+  // ---- Visualizar publicaciones de otros usuarios
+
+  getEmpleados(): void {
+
+    this.empleados = [];
+    
+    var that = this;
+
+    this.api_serv.getQuery(`plaza_vestido/employees`)
+    .subscribe({
+      next(response : any) {
+        console.log(response);
+        that.empleados = response.data;
+
+      },
+      error(msg) {
+        console.log(msg);
+        that.tratarError(msg);
+      }
+    });
+
   }
 
 }

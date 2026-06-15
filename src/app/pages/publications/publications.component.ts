@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ToasterConfig } from 'angular2-toaster';
 import { NbSpinnerService, NbThemeService } from '@nebular/theme';
+
+import { CatalogoComponent } from './components/catalogo/catalogo.component';
 
 @Component({
   selector: 'app-publications',
@@ -26,6 +28,8 @@ export class PublicationsComponent implements OnInit {
     limit: 5,
   });
 
+  @ViewChild(CatalogoComponent) CatalogoC: CatalogoComponent;
+
   constructor(
     public nbspinnerservice:NbSpinnerService,
     public themeService:NbThemeService
@@ -43,5 +47,8 @@ export class PublicationsComponent implements OnInit {
     this.selectedTab1 = tab === 1;
     this.selectedTab2 = tab === 2;
     this.selectedTab3 = tab === 3;
+    if(tab === 3){
+      this.CatalogoC.initComponent();
+    }
   }
 }

@@ -1,0 +1,584 @@
+
+<div style="display:flex; gap:12px; margin: 16px 0;">
+    <button 
+        (click)="formLista.tipo = 'cortes'"
+        [ngClass]="formLista.tipo === 'cortes' ? 'btn-primary' : 'btn-secondary'"
+        style="flex:1;"
+        class="btn btn-tn">
+        <i class="fa fa-calculator" aria-hidden="true"></i> Cortes
+    </button>
+
+    <button 
+        (click)="formLista.tipo = 'historial'; initComponent2();"
+        [ngClass]="formLista.tipo === 'historial' ? 'btn-primary' : 'btn-secondary'"
+        style="flex:1;"
+        class="btn btn-tn">
+        <i class="fa fa-history" aria-hidden="true"></i> Historial
+    </button>
+</div>
+
+<div *ngIf="formLista.tipo === 'cortes'">
+    <br>
+    <div class="row">
+        <div class="col-12" style="text-align: right">
+            <button style="display: inline-block;" type="button" class="btn btn-icon btn-tn btn-primary" 
+                title="Refresh" (click)="refreshTabla()"> 
+                    <i class="fa fa-refresh icon-refresh"></i>
+            </button>
+        </div>
+    </div>
+    <div class="row mt-4" *ngIf="userRole === 1">
+        <div class="col-12"> 
+            <div class="alert alert-info d-flex align-items-center" role="alert">
+                <!-- Icono de información o usuario -->
+                <i class="fa fa-info-circle mr-2" aria-hidden="true"></i> 
+                <div>
+                    Los cortes de caja se calculan sobre las órdenes <strong>Finalizadas.</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div *ngIf="globales" class="row mb-4">
+  
+        <div class="col-md-6 mb-3 mb-md-0">
+            <div class="card bg-gradient-primary text-white shadow-lg h-100">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div>
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h6 class="mb-0">
+                        <i class="fa fa-calculator mr-2"></i>
+                        Corte: Ingresos Menos Gastos
+                    </h6>
+                    <button class="btn btn-light text-primary shadow-sm" 
+                            style="padding: 0.15rem 0.4rem; font-size: 0.7rem; line-height: 1; border-radius: 0.25rem; cursor: pointer;"
+                            (click)="aCortarBoC('B')" 
+                            title="Cortar Caja">
+                        <i class="fa fa-lock mr-1"></i> Cortar
+                    </button>
+                </div>
+                
+                <!-- <p class="mb-2 text-white-50" style="font-size: 0.85rem;">
+                    <i class="fa fa-calendar-o mr-1"></i>
+                    Acumulado desde: {{ globales.periodo_ingresos_desde | date:'dd/MM/yyyy HH:mm' }}
+                </p> -->
+                <p class="mb-2 text-white-50" style="font-size: 0.85rem;">
+                    Acumulado:
+                </p>
+                
+                <h3 class="mb-4 fw-bold">
+                    ${{ globales.corte_ingresos_gastos | number:'1.2-2' }}
+                </h3>
+                </div>
+
+                <div class="row text-white-50 pt-2 style-desglose-border">
+                <div class="col-4">
+                    <small class="d-block text-uppercase" style="font-size: 0.7rem;">
+                        <i class="fa fa-money mr-1"></i> Comisión
+                    </small>
+                    <span class="text-white fw-semibold">${{ globales.total_comision_b | number:'1.2-2' }}</span>
+                </div>
+                <div class="col-4">
+                    <small class="d-block text-uppercase" style="font-size: 0.7rem;">
+                        <i class="fa fa-truck mr-1"></i> Envíos
+                    </small>
+                    <span class="text-white fw-semibold">${{ globales.total_envios_b | number:'1.2-2' }}</span>
+                </div>
+                <div class="col-4">
+                    <small class="d-block text-uppercase" style="font-size: 0.7rem;">
+                        <i class="fa fa-minus-circle mr-1"></i> Gastos
+                    </small>
+                    <span class="text-white fw-semibold text-danger-light">-${{ globales.total_gastos_b | number:'1.2-2' }}</span>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card bg-gradient-primary text-white shadow-lg h-100">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div>
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h6 class="mb-0">
+                        <i class="fa fa-percent mr-2"></i>
+                        Corte: Comisión + Envíos
+                    </h6>
+                    <button class="btn btn-light text-primary shadow-sm" 
+                            style="padding: 0.15rem 0.4rem; font-size: 0.7rem; line-height: 1; border-radius: 0.25rem; cursor: pointer;"
+                            (click)="aCortarBoC('C')" 
+                            title="Cortar Caja">
+                        <i class="fa fa-lock mr-1"></i> Cortar
+                    </button>
+                </div>
+                
+                <!-- <p class="mb-2 text-white-50" style="font-size: 0.85rem;">
+                    <i class="fa fa-calendar-o mr-1"></i>
+                    Acumulado desde: {{ globales.periodo_comision_desde | date:'dd/MM/yyyy HH:mm' }}
+                </p> -->
+                <p class="mb-2 text-white-50" style="font-size: 0.85rem;">
+                    Acumulado:
+                </p>
+
+                <h3 class="mb-4 fw-bold">
+                    ${{ globales.corte_comision_envios | number:'1.2-2' }}
+                </h3>
+                </div>
+
+                <div class="row text-white-50 pt-2 style-desglose-border">
+                <div class="col-6">
+                    <small class="d-block text-uppercase" style="font-size: 0.7rem;">
+                    <i class="fa fa-money mr-1"></i> Comisión
+                    </small>
+                    <span class="text-white h6 mb-0 fw-semibold">${{ globales.total_comision_c | number:'1.2-2' }}</span>
+                </div>
+                <div class="col-6">
+                    <small class="d-block text-uppercase" style="font-size: 0.7rem;">
+                    <i class="fa fa-truck mr-1"></i> Envíos
+                    </small>
+                    <span class="text-white h6 mb-0 fw-semibold">${{ globales.total_envios_c | number:'1.2-2' }}</span>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+    </div>
+    <hr>
+    <h4 class="mt-4">Corte de Caja de Proveedores</h4>
+    <br>
+    <div class="row" *ngIf="listado?.length === 0 && !loading">
+        <div class="col-12"> 
+            <div class="alert alert-info d-flex align-items-center" role="alert">
+                <!-- Icono de información o usuario -->
+                <i class="fa fa-info-circle mr-2" aria-hidden="true"></i> 
+                <div>
+                    No hay cortes de caja pendientes para proveedores.
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="listado?.length > 0">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">    
+                    <div class="input-group">
+                        <input placeholder="Buscar..." class="form-control" type="text" id="inputSupplier" [(ngModel)]="inputTermino" (ngModelChange)="FilterByTermino()"/> 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-12"> 
+            <div class="table-responsive">
+                <table class="table">
+                <thead>
+                    <tr>
+                    <th >Proveedor</th>
+                    <th >Total Vendido</th>
+                    <th >Total Neto Pendiente (-10%)</th>
+                    <th >Acciones</th>
+                    </tr>
+                </thead>  
+                <tbody>
+                    <tr *ngFor="let item of items; let i = index" >
+                        
+                    <td >{{ item.razon_social }}</td>
+                    <td >{{ item.total_vendido | number:'1.2-2' }}</td>
+                    <td><strong>{{ item.total_deuda | number:'1.2-2' }}</strong></td>
+                    <td >
+                        <button
+                            type="button"
+                            class="btn btn-tn btn-warning" title="Realizar Corte"
+                            (click)="aCortarA(item)">
+                            <i class="fa fa-lock mr-1"></i> Cortar
+                        </button>
+                    </td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-12"> 
+            <div class="btn-toolbar" role="toolbar" style="margin: 0;">
+                <div class="btn-group">
+                <label style="margin-top:10px">Página {{currentIndex}}/{{pageNumber}} </label>
+                </div>
+                <div class="btn-group pull-right">
+                <ul class="pagination" >
+                    <li class="page-item" [ngClass]="{'disabled': (currentIndex == 1 || pageNumber == 0)}" ><a class="page-link"  (click)="prevPage()" >Atrás</a></li>
+                    <li class="page-item" *ngFor="let page of pagesIndex"  [ngClass]="{'active': (currentIndex == page)}">
+                        <a class="page-link" (click)="setPage(page)"  >{{page}} </a>
+                    </li>
+                    <li class="page-item" [ngClass]="{'disabled': (currentIndex == pageNumber || pageNumber == 0)}" ><a class="page-link"   (click)="nextPage()" >Siguiente</a></li>
+                </ul>
+                </div>
+            </div> 
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="formLista.tipo === 'historial'">
+    <br>
+    <div class="row">
+        <div class="col-12" style="text-align: right">
+            <button style="display: inline-block;" type="button" class="btn btn-icon btn-tn btn-primary" 
+                title="Refresh" (click)="refreshTabla2()"> 
+                    <i class="fa fa-refresh icon-refresh"></i>
+            </button>
+        </div>
+    </div>
+    <br>
+    <div class="form-row"> 
+        <div class="col-md-2 offset-md-3 col-sm-12 form-group">
+            <label for="selectedStartDate2">Fecha inicial:</label>
+            <input 
+                type="date"
+                class="form-control" 
+                autocomplete="off" 
+                placeholder="Fecha inicial" 
+                [(ngModel)]="filtros2.fecha_inicio"
+                id="selectedStartDate2" 
+                required 
+            />
+        </div>
+
+        <div class="col-md-2 col-sm-12 form-group">
+            <label for="selectedEndDate2">Fecha final:</label>
+            <input 
+                type="date"
+                class="form-control" 
+                autocomplete="off" 
+                placeholder="Fecha final" 
+                [(ngModel)]="filtros2.fecha_fin"
+                id="selectedEndDate2" 
+                required 
+            />
+        </div>
+
+        <div class="col-md-2 col-sm-12 form-group d-flex align-items-end">
+            <button 
+                class="btn btn-primary btn-block btn-tn" 
+                (click)="getListado2()">
+                Filtrar
+            </button>
+        </div>
+
+    </div>
+    <br>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">    
+                <div class="input-group">
+                    <input placeholder="Buscar..." class="form-control" type="text" id="inputSupplier2" [(ngModel)]="inputTermino2" (ngModelChange)="FilterByTermino2()"/> 
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-12"> 
+        <div class="table-responsive">
+            <table class="table">
+            <thead>
+                <tr>
+                <th>ID</th>
+                <th>Fecha</th>
+                <th>Acumulado</th>
+                <th>Tipo</th>
+                <th>Acciones</th>
+                </tr>
+            </thead>  
+            <tbody>
+                <tr *ngFor="let item of items2; let i = index">
+                    
+                <td>{{ item.id }}</td>
+                <td>{{ item.created_at | date:'yyyy-MM-dd HH:mm' }}</td>
+                <td>{{ item.monto }}</td>
+                <td>
+                    <!-- Badge de tipo -->
+                    <span [ngClass]="{
+                        'badge-proveedor':       item.tipo === 'proveedor',
+                        'badge-ingresos_gastos': item.tipo === 'ingresos_gastos',
+                        'badge-comision_envios': item.tipo === 'comision_envios'
+                    }" style="font-size: 11px;">
+                        {{ obtenerCadena(item.tipo) }}
+                    </span>
+
+                    <div *ngIf="item.tipo === 'proveedor'" class="mt-1">
+                        <div style="font-size: 0.85em; color: #aaa; font-weight: 500;">
+                            {{ item.supplier?.razon_social }}
+                        </div>
+                        
+                        <div class="mt-1">
+                            <a href="javascript:void(0)" 
+                            (click)="descargarComprobante(item)" 
+                            class="descargar-link"
+                            style="font-size: 0.75em; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                                <i class="fa fa-file-pdf-o"></i> Descargar Comprobante
+                            </a>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <button
+                        type="button" 
+                        class="btn btn-tn btn-primary" title="Editar" 
+                        (click)="detalles(item, i)">
+                        Detalles
+                    </button>
+                </td>
+                </tr>
+            </tbody>
+            </table>
+        </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-12"> 
+        <div class="btn-toolbar" role="toolbar" style="margin: 0;">
+            <div class="btn-group">
+            <label style="margin-top:10px">Página {{currentIndex2}}/{{pageNumber2}} </label>
+            </div>
+            <div class="btn-group pull-right">
+            <ul class="pagination">
+                <li class="page-item" [ngClass]="{'disabled': (currentIndex2 == 1 || pageNumber2 == 0)}"><a class="page-link" (click)="prevPage2()">Atrás</a></li>
+                <li class="page-item" *ngFor="let page of pagesIndex2" [ngClass]="{'active': (currentIndex2 == page)}">
+                    <a class="page-link" (click)="setPage2(page)">{{page}} </a>
+                </li>
+                <li class="page-item" [ngClass]="{'disabled': (currentIndex2 == pageNumber2 || pageNumber2 == 0)}"><a class="page-link" (click)="nextPage2()">Siguiente</a></li>
+            </ul>
+            </div>
+        </div> 
+        </div>
+    </div>
+</div>
+
+<ng-template #modalCorte id="modalCorte" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">
+        {{ selectObj?.tipo === 'ingresos_gastos' ? 'Corte: Ingresos Menos Gastos' : selectObj?.tipo === 'comision_envios' ? 'Corte: Comisión + Envíos' : 'Corte de Caja de Proveedor' }}
+    </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <div *ngIf="selectObj && selectObj.tipo === 'ingresos_gastos'">
+        <p class="mb-4 text-white-50" style="font-size: 0.85rem;">
+            <i class="fa fa-calendar-o mr-1"></i>
+            Fecha: {{ selectObj.created_at | date:'dd/MM/yyyy HH:mm' }}
+        </p>
+        <p class="mb-2 text-white-50" style="font-size: 0.85rem;">
+            Acumulado:
+        </p>
+        
+        <h3 class="mb-4 fw-bold">
+            ${{ selectObj.monto | number:'1.2-2' }}
+        </h3>
+
+        <div class="row text-white-50 pt-2 style-desglose-border">
+        <div class="col-4">
+            <small class="d-block text-uppercase" style="font-size: 0.7rem;">
+                <i class="fa fa-money mr-1"></i> Comisión
+            </small>
+            <span class="text-white fw-semibold">${{ selectObj.total_comision | number:'1.2-2' }}</span>
+        </div>
+        <div class="col-4">
+            <small class="d-block text-uppercase" style="font-size: 0.7rem;">
+                <i class="fa fa-truck mr-1"></i> Envíos
+            </small>
+            <span class="text-white fw-semibold">${{ selectObj.total_envios | number:'1.2-2' }}</span>
+        </div>
+        <div class="col-4">
+            <small class="d-block text-uppercase" style="font-size: 0.7rem;">
+                <i class="fa fa-minus-circle mr-1"></i> Gastos
+            </small>
+            <span class="text-white fw-semibold text-danger-light">-${{ selectObj.total_gastos | number:'1.2-2' }}</span>
+        </div>
+        
+        </div>
+    </div>
+
+    <div *ngIf="selectObj && selectObj.tipo === 'comision_envios'">
+        <p class="mb-4 text-white-50" style="font-size: 0.85rem;">
+            <i class="fa fa-calendar-o mr-1"></i>
+            Fecha: {{ selectObj.created_at | date:'dd/MM/yyyy HH:mm' }}
+        </p>
+        <p class="mb-2 text-white-50" style="font-size: 0.85rem;">
+            Acumulado:
+        </p>
+
+        <h3 class="mb-4 fw-bold">
+            ${{ selectObj.monto | number:'1.2-2' }}
+        </h3>
+
+        <div class="row text-white-50 pt-2 style-desglose-border">
+        <div class="col-6">
+            <small class="d-block text-uppercase" style="font-size: 0.7rem;">
+            <i class="fa fa-money mr-1"></i> Comisión
+            </small>
+            <span class="text-white h6 mb-0 fw-semibold">${{ selectObj.total_comision | number:'1.2-2' }}</span>
+        </div>
+        <div class="col-6">
+            <small class="d-block text-uppercase" style="font-size: 0.7rem;">
+            <i class="fa fa-truck mr-1"></i> Envíos
+            </small>
+            <span class="text-white h6 mb-0 fw-semibold">${{ selectObj.total_envios | number:'1.2-2' }}</span>
+        </div>
+        </div>
+    </div>
+
+    <div *ngIf="selectObj && selectObj.tipo === 'proveedor'">
+        <p class="mb-2 text-white-50" style="font-size: 0.85rem;">
+            Fecha: {{ selectObj?.created_at | date:'dd/MM/yyyy HH:mm' }}
+        </p>
+        <p class="mb-2 text-white-50" style="font-size: 0.85rem;">
+            Proveedor: {{ selectObj?.supplier?.razon_social }}
+        </p>
+        <p class="mb-2 text-white-50" style="font-size: 0.85rem;">
+            Total Vendido: {{ selectObj?.total_vendido | currency }}
+        </p>
+        <h6 class="mb-2 fw-bold">
+            Total Entregado: <strong>{{ selectObj?.monto | currency }}</strong>
+        </h6> 
+        <p class="mb-2 text-white-50" style="font-size: 0.85rem;">
+            Método de pago: {{ selectObj?.metodo_pago | titlecase }}
+        </p>   
+        
+    </div>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Atrás</button>
+  </div>
+</ng-template>
+
+<ng-template #modalCorteByC id="modalCorteByC" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">
+        {{ corte === 'B' ? 'Corte: Ingresos Menos Gastos' : corte === 'C' ? 'Corte: Comisión + Envíos' : 'Corte de Caja de Proveedor' }}
+    </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <div *ngIf="corte === 'B'">
+        <!-- <p class="mb-2 text-white-50" style="font-size: 0.85rem;">
+            <i class="fa fa-calendar-o mr-1"></i>
+            Acumulado desde: {{ globales.periodo_ingresos_desde | date:'dd/MM/yyyy HH:mm' }}
+        </p> -->
+        <p class="mb-2 text-white-50" style="font-size: 0.85rem;">
+            Acumulado:
+        </p>
+        
+        <h3 class="mb-4 fw-bold">
+            ${{ globales.corte_ingresos_gastos | number:'1.2-2' }}
+        </h3>
+
+        <div class="row text-white-50 pt-2 style-desglose-border">
+        <div class="col-4">
+            <small class="d-block text-uppercase" style="font-size: 0.7rem;">
+                <i class="fa fa-money mr-1"></i> Comisión
+            </small>
+            <span class="text-white fw-semibold">${{ globales.total_comision_b | number:'1.2-2' }}</span>
+        </div>
+        <div class="col-4">
+            <small class="d-block text-uppercase" style="font-size: 0.7rem;">
+                <i class="fa fa-truck mr-1"></i> Envíos
+            </small>
+            <span class="text-white fw-semibold">${{ globales.total_envios_b | number:'1.2-2' }}</span>
+        </div>
+        <div class="col-4">
+            <small class="d-block text-uppercase" style="font-size: 0.7rem;">
+                <i class="fa fa-minus-circle mr-1"></i> Gastos
+            </small>
+            <span class="text-white fw-semibold text-danger-light">-${{ globales.total_gastos_b | number:'1.2-2' }}</span>
+        </div>
+        
+        </div>
+    </div>
+
+    <div *ngIf="corte === 'C'">
+        <!-- <p class="mb-2 text-white-50" style="font-size: 0.85rem;">
+            <i class="fa fa-calendar-o mr-1"></i>
+            Acumulado desde: {{ globales.periodo_comision_desde | date:'dd/MM/yyyy HH:mm' }}
+        </p> -->
+        <p class="mb-2 text-white-50" style="font-size: 0.85rem;">
+            Acumulado:
+        </p>
+
+        <h3 class="mb-4 fw-bold">
+            ${{ globales.corte_comision_envios | number:'1.2-2' }}
+        </h3>
+
+        <div class="row text-white-50 pt-2 style-desglose-border">
+        <div class="col-6">
+            <small class="d-block text-uppercase" style="font-size: 0.7rem;">
+            <i class="fa fa-money mr-1"></i> Comisión
+            </small>
+            <span class="text-white h6 mb-0 fw-semibold">${{ globales.total_comision_c | number:'1.2-2' }}</span>
+        </div>
+        <div class="col-6">
+            <small class="d-block text-uppercase" style="font-size: 0.7rem;">
+            <i class="fa fa-truck mr-1"></i> Envíos
+            </small>
+            <span class="text-white h6 mb-0 fw-semibold">${{ globales.total_envios_c | number:'1.2-2' }}</span>
+        </div>
+        </div>
+    </div>
+
+    <div *ngIf="corte === 'A' && selectProveedor">
+        <p class="mb-2 text-white-50" style="font-size: 0.85rem;">
+            Proveedor: {{ selectProveedor?.razon_social }}
+        </p>
+        <p class="mb-2 text-white-50" style="font-size: 0.85rem;">
+            Total Vendido: {{ selectProveedor?.total_vendido | currency }}
+        </p>
+        <h6 class="mb-4 fw-bold">
+            Total Neto Pendiente (-10%): <strong>{{ selectProveedor?.total_deuda | currency }}</strong>
+        </h6>    
+        
+        <div class="row">
+            <div class="col-12">
+                <label class="form-control-label">Tipo de pago</label>
+                <select [(ngModel)]="formPago.tipo" class="form-control">
+                <option value="efectivo">Efectivo</option>
+                <option value="transferencia">Transferencia</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <p>¿Estás seguro que desea realizar el corte?</p>
+            <p style="color:#888; font-size:0.9em;">Esta acción no se puede deshacer.</p>
+        </div>
+    </div>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click')">Cancelar</button>
+    <button 
+        type="button" class="btn btn-tn btn-danger" 
+        (click)="ejecutarCorte()" [disabled]="corte === 'A' && (!formPago.tipo || formPago.tipo === '')">
+            Aceptar
+    </button>
+  </div>
+</ng-template>
+
+<toaster-container [toasterconfig]="config"></toaster-container>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>

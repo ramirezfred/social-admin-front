@@ -38,12 +38,18 @@
                 (click)="selectTab(5)">
               Reportes
             </a>
-            <!-- <a [ngClass]="{'nav-item nav-link active': selectedTab6, 'nav-item nav-link': !selectedTab6}" 
+            <a *ngIf="userRole === 1" [ngClass]="{'nav-item nav-link active': selectedTab6, 'nav-item nav-link': !selectedTab6}" 
                 style="cursor: pointer;" id="nav-tab6" data-toggle="tab" 
                 role="tab" aria-controls="nav-6" aria-selected="true" 
                 (click)="selectTab(6)">
-              Métricas
-            </a> -->
+              Gastos y Nómina
+            </a>
+            <a *ngIf="userRole === 1" [ngClass]="{'nav-item nav-link active': selectedTab7, 'nav-item nav-link': !selectedTab7}" 
+                style="cursor: pointer;" id="nav-tab7" data-toggle="tab" 
+                role="tab" aria-controls="nav-7" aria-selected="true" 
+                (click)="selectTab(7)">
+              Cortes de caja
+            </a>
           </div>
         </nav>
         <div class="tab-content" id="nav-tabContent">
@@ -72,11 +78,16 @@
             <br>
             <app-reports></app-reports>
           </div>
-          <!-- <div [ngClass]="{'tab-pane fade show active': selectedTab6, 'tab-pane fade': !selectedTab6}" 
+          <div *ngIf="userRole === 1" [ngClass]="{'tab-pane fade show active': selectedTab6, 'tab-pane fade': !selectedTab6}" 
             id="nav-6" role="tabpanel" aria-labelledby="nav-tab5">
             <br>
-            <app-statistics></app-statistics>
-          </div> -->
+            <app-expenses-and-payroll></app-expenses-and-payroll>
+          </div>
+          <div *ngIf="userRole === 1" [ngClass]="{'tab-pane fade show active': selectedTab7, 'tab-pane fade': !selectedTab7}" 
+            id="nav-7" role="tabpanel" aria-labelledby="nav-tab7">
+            <br>
+            <app-cash-closes></app-cash-closes>
+          </div>
         </div>
         
       </nb-card-body>
@@ -85,4 +96,40 @@
   </div>
 </div>
 
+<!-- Modal Password -->
+<ng-template #modalPassword id="modalPassword" let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Password</h4>
+    <button type="button" class="close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+
+    <div class="row mt-3 mb-3"> 
+      <div class="col-12">
+        <input type="text" title="Invisible prevent autofill" style="position: absolute; left: -9999px;" autocomplete="off">
+      </div>     
+      <div class="col-12">
+        <label class="form-control-label">Ingresar Password</label>
+        <input type="password" [(ngModel)]="formLogin.password" 
+          class="form-control" placeholder="Contraseña" required
+          autocomplete="new-password">
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-tn btn-secondary" (click)="c('Close click');">Atrás</button>
+    <button type="button" class="btn btn-tn btn-danger" 
+      (click)="Ingresar()"
+      [disabled]="!formLogin.password">
+      Aceptar
+    </button>
+  </div>
+</ng-template>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>
 

@@ -19,6 +19,20 @@ import { FormBuilder, FormArray, FormGroup, Validators, FormControl } from '@ang
 
 import { SesionService } from '../../../../services/sesion/sesion.service';
 
+interface Semana {
+  fecha_inicio: Date;
+  fecha_fin: Date;
+  label: string;
+  value: string;
+};
+
+interface EstadisticasResponse {
+  supplier_id: number;
+  razon_social: string;
+  total_vendido: string;
+  total_deuda: string;
+};
+
 @Component({
   selector: 'app-suppliers',
   templateUrl: './suppliers.component.html',
@@ -60,9 +74,16 @@ export class SuppliersComponent implements OnInit {
 
   @ViewChild('modalCrear') modalCrear : ElementRef;
   @ViewChild('modalEliminar') modalEliminar : ElementRef;
+  @ViewChild('modalGenerado') modalGenerado : ElementRef;
   modalRef: any;
 
   userRole = 0;
+
+  estadisticas: EstadisticasResponse | null = null;
+  semanas: Semana[] = [];
+  semanaSeleccionada: string = '';
+  
+  formFechas: FormGroup;
 
   constructor(
       private modalService: NgbModal,
@@ -73,10 +94,17 @@ export class SuppliersComponent implements OnInit {
       private sesion_serv: SesionService
   ) { 
     this.crearFormulario(0);
+
+    this.formFechas = this.fb.group({
+      fecha_inicio: [''],
+      fecha_fin: ['']
+    });
   }
 
   ngOnInit() {
     this.userRole = this.sesion_serv.getUserRol();
+
+    this.generarSemanas();
   }
 
   private showToast(type: string, title: string, body: string) {
@@ -134,7 +162,7 @@ export class SuppliersComponent implements OnInit {
 
   }
 
-  //----Tabla<
+  //#region Tabla
   public listado:any;
   filteredItems : any;
   pages : number = 4;
@@ -225,7 +253,7 @@ export class SuppliersComponent implements OnInit {
     this.currentIndex = index;
     this.refreshItems();
   }
-  //----Tabla>
+  //#endregion
 
   initComponent(){
     if(!this.bandera_init){
@@ -480,5 +508,150 @@ export class SuppliersComponent implements OnInit {
     });
 
   }
+
+  //#region Generado por semana
+
+  getGenerado(item : any, index: number): void {
+    this.selectObj = JSON.parse(JSON.stringify(item));
+    this.selectObjIndex = index;
+    this.seleccionarSemanaActual();
+    this.open2(this.modalGenerado);
+  }
+
+  generarSemanas() {
+    const hoy = new Date();
+    const semanaActual = this.getSemanaActual();
+    this.semanas.push(semanaActual);
+    
+    let fechaReferencia = new Date(semanaActual.fecha_inicio);
+    for (let i = 1; i <= 5; i++) {
+      fechaReferencia = new Date(fechaReferencia);
+      fechaReferencia.setDate(fechaReferencia.getDate() - 7);
+      
+      const semanaAnterior: Semana = {
+        fecha_inicio: new Date(fechaReferencia),
+        fecha_fin: new Date(fechaReferencia),
+        label: '',
+        value: ''
+      };
+      semanaAnterior.fecha_fin.setDate(semanaAnterior.fecha_fin.getDate() + 6);
+      semanaAnterior.label = this.formatSemanaLabel(semanaAnterior);
+      semanaAnterior.value = `${this.formatDateForInput(semanaAnterior.fecha_inicio)}|${this.formatDateForInput(semanaAnterior.fecha_fin)}`;
+      
+      this.semanas.push(semanaAnterior);
+    }
+  }
+
+  getSemanaActual(): Semana {
+    const hoy = new Date();
+    const diaSemana = hoy.getDay();
+    
+    let diasParaViernes;
+    if (diaSemana === 5) {
+      diasParaViernes = 0;
+    } else if (diaSemana === 6) {
+      diasParaViernes = -1;
+    } else {
+      diasParaViernes = -(diaSemana + 2);
+    }
+    
+    const fechaInicio = new Date(hoy);
+    fechaInicio.setDate(hoy.getDate() + diasParaViernes);
+    
+    const fechaFin = new Date(fechaInicio);
+    fechaFin.setDate(fechaInicio.getDate() + 6);
+    
+    return {
+      fecha_inicio: fechaInicio,
+      fecha_fin: fechaFin,
+      label: this.formatSemanaLabel({ fecha_inicio: fechaInicio, fecha_fin: fechaFin } as Semana),
+      value: `${this.formatDateForInput(fechaInicio)}|${this.formatDateForInput(fechaFin)}`
+    };
+  }
+
+  formatSemanaLabel(semana: Semana): string {
+    const inicio = `${semana.fecha_inicio.getDate().toString().padStart(2, '0')}/${(semana.fecha_inicio.getMonth() + 1).toString().padStart(2, '0')}`;
+    const fin = `${semana.fecha_fin.getDate().toString().padStart(2, '0')}/${(semana.fecha_fin.getMonth() + 1).toString().padStart(2, '0')}`;
+    return `${inicio} - ${fin}`;
+  }
+
+  formatDateForInput(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  seleccionarSemanaActual() {
+    const semanaActual = this.semanas[0];
+    this.semanaSeleccionada = semanaActual.value;
+    this.formFechas.patchValue({
+      fecha_inicio: this.formatDateForInput(semanaActual.fecha_inicio),
+      fecha_fin: this.formatDateForInput(semanaActual.fecha_fin)
+    });
+    this.consultarEstadisticas();
+  }
+
+  onSemanaChange(event: any) {
+    const [fechaInicio, fechaFin] = event.target.value.split('|');
+    if (fechaInicio && fechaFin) {
+      this.formFechas.patchValue({
+        fecha_inicio: fechaInicio,
+        fecha_fin: fechaFin
+      });
+      this.consultarEstadisticas();
+    }
+  }
+
+  consultarEstadisticas() {
+    const fechas = this.formFechas.value;
+    if (!fechas.fecha_inicio || !fechas.fecha_fin) {
+      return;
+    }
+
+    this.estadisticas = null;
+
+    this.loading = true;
+    
+    var that = this;
+
+    let params = new URLSearchParams();
+
+    params.append('fecha_inicio', fechas.fecha_inicio);
+    params.append('fecha_fin', fechas.fecha_fin);
+
+    this.api_serv.getQuery(`plaza_vestido/suppliers/${this.selectObj.id}/generado-por-semana?${params.toString()}`)
+    .subscribe({
+      next(response : any) {
+        console.log(response);
+        if(response.data){
+          that.estadisticas = response.data;
+        }/*else{
+          that.showToast('info', 'Info!', response.message);
+        }*/
+         
+        that.loading = false; 
+
+      },
+      error(msg) {
+        console.log(msg);
+        that.loading = false;
+        that.tratarError(msg);
+      }
+    });
+  }
+
+  aplicarFechasManuales() {
+    if (this.formFechas.valid) {
+      this.semanaSeleccionada = '';
+      this.consultarEstadisticas();
+    }
+  }
+
+  limpiar(){
+    this.seleccionarSemanaActual(); // Recarga con el filtro
+  }
+
+  //#endregion
 
 }

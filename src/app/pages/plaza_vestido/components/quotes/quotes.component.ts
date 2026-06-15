@@ -145,8 +145,14 @@ export class QuotesComponent implements OnInit, OnDestroy {
   @ViewChild('modalFinalizar') modalFinalizar : ElementRef;
   @ViewChild('modalCancelar') modalCancelar : ElementRef;
 
-  formEntrega  = { tipo: '' };
-  formFinalizar = { tipo_entrega: '' };
+  formEntrega  = { 
+    tipo: '',
+    costo_guia: null,
+  };
+  formFinalizar = { 
+    tipo_entrega: '',
+    costo_guia: null,
+  };
 
   public empleados: any[] = []; // Cargar desde un servicio
   public userIdSel: string; // Valor inicial
@@ -1229,6 +1235,7 @@ solo responde a este mensaje.
   abrirModalTipoEntrega(cotizacion: any) {
     this.cotizacionSeleccionada = cotizacion;
     this.formEntrega.tipo = cotizacion.tipo_entrega || '';
+    this.formEntrega.costo_guia = cotizacion.costo_guia || null;
     this.modalTipoEntregaVisible = true;
     this.open(this.modalTipoEntrega);
   }
@@ -1237,6 +1244,7 @@ solo responde a este mensaje.
     this.modalTipoEntregaVisible = false;
     this.cotizacionSeleccionada  = null;
     this.formEntrega.tipo = '';
+    this.formEntrega.costo_guia = null;
     if (this.modalRef) {
       this.modalRef.close();
     }
@@ -1254,7 +1262,12 @@ solo responde a este mensaje.
 
     var that = this;
 
-    this.api_serv.putQuery(`plaza_vestido/quotes/${ this.cotizacionSeleccionada.id }/set_estado_and_entrega`, { tipo_entrega: this.formEntrega.tipo })
+    var datos = { 
+      tipo_entrega: this.formEntrega.tipo,
+      costo_guia: (this.formEntrega.tipo === 'envio') ? this.formEntrega.costo_guia : null
+    }; 
+
+    this.api_serv.putQuery(`plaza_vestido/quotes/${ this.cotizacionSeleccionada.id }/set_estado_and_entrega`, datos)
     .subscribe({
       next(response : any) {
            
@@ -1327,6 +1340,7 @@ solo responde a este mensaje.
   abrirModalFinalizar(cotizacion: any) {
     this.cotizacionSeleccionada  = cotizacion;
     this.formFinalizar.tipo_entrega = '';
+    this.formFinalizar.costo_guia = null;
     this.modalFinalizarVisible = true;
     this.open(this.modalFinalizar);
   }
@@ -1335,6 +1349,7 @@ solo responde a este mensaje.
     this.modalFinalizarVisible  = false;
     this.cotizacionSeleccionada = null;
     this.formFinalizar.tipo_entrega = '';
+    this.formFinalizar.costo_guia = null;
     if (this.modalRef) {
       this.modalRef.close();
     }
@@ -1348,6 +1363,7 @@ solo responde a este mensaje.
     if (!this.cotizacionSeleccionada.tipo_entrega && this.formFinalizar.tipo_entrega) {
       body = {
         tipo_entrega: this.formFinalizar.tipo_entrega,
+        costo_guia: (this.formFinalizar.tipo_entrega === 'envio') ? this.formFinalizar.costo_guia : null,
         estado: 'finalizada',
       };
     }else{
