@@ -57,6 +57,7 @@ export class ReportsComponent implements OnInit {
       public fb: FormBuilder,
   ) { 
     this.crearFormulario();
+    this.escucharCambiosTipo();
   }
 
   ngOnInit() {
@@ -191,12 +192,33 @@ export class ReportsComponent implements OnInit {
     
   }
 
+  escucharCambiosTipo(): void {
+    const tipoCtrl = this.myForm.get('tipo');
+
+    if (tipoCtrl) {
+      tipoCtrl.valueChanges.subscribe((tipoSeleccionado) => {
+        const fechaInicioCtrl = this.myForm.get('fecha_inicio');
+        const fechaFinCtrl = this.myForm.get('fecha_fin');
+
+        if (tipoSeleccionado === 'ingresosEgresos') {
+          // Validación clásica en lugar de ?.disable()
+          if (fechaInicioCtrl) { fechaInicioCtrl.disable(); }
+          if (fechaFinCtrl) { fechaFinCtrl.disable(); }
+        } else {
+          // Validación clásica en lugar de ?.enable()
+          if (fechaInicioCtrl) { fechaInicioCtrl.enable(); }
+          if (fechaFinCtrl) { fechaFinCtrl.enable(); }
+        }
+      });
+    }
+  }
+
   limpiar(){
     this.setFechasPorDefecto();
 
     this.myForm.patchValue({
       tipo: 'semanal',
-    }, { emitEvent: false }); // importante
+    }); 
   }
 
 }

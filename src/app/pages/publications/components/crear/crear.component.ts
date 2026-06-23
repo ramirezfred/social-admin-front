@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToasterService, ToasterConfig, Toast, BodyOutputType } from 'angular2-toaster';
 import 'style-loader!angular2-toaster/toaster.css';
@@ -19,7 +19,7 @@ import { SesionService } from '../../../../services/sesion/sesion.service';
   templateUrl: './crear.component.html',
   styleUrls: ['./crear.component.scss']
 })
-export class CrearComponent implements OnInit, OnDestroy {
+export class CrearComponent implements OnInit, OnDestroy, OnChanges {
 
   // ---- Alertas ----
   config: ToasterConfig;
@@ -54,6 +54,12 @@ export class CrearComponent implements OnInit, OnDestroy {
   codigoGenerado: string = '';
 
   userId: number | null = null;
+
+  // Recibe el ID desde el padre
+  @Input() idPublicacionEdit: any = null;
+  @Output() edicionFinalizadaEvent = new EventEmitter<void>();
+
+  esModoEdicion = false;
 
   constructor(
     private toasterService: ToasterService,
@@ -559,5 +565,207 @@ export class CrearComponent implements OnInit, OnDestroy {
 
     return `${iniciales}-${fecha}-${hora}`;
   }
+
+  //#region Editar publicacion
+
+  // Detecta cuando el padre le envía un nuevo ID
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['idPublicacionEdit'] && changes['idPublicacionEdit'].currentValue) {
+      this.esModoEdicion = true;
+      this.limpiarFormulario();
+      this.cargarPublicacionParaEditar(changes['idPublicacionEdit'].currentValue);
+    } else {
+      // Cuando el ID pasa a ser null
+      this.esModoEdicion = false;
+      this.limpiarFormulario();
+    }
+  }
+
+  cargarPublicacionParaEditar(id: any) {
+
+    this.loading = true;
+    const that = this;
+
+    // 1. Obtener la data y los archivos PRIMERO
+    this.publicationService.show(id).subscribe({
+      next: async (response: any) => {
+        try {
+
+          // console.log(response);
+
+          that.formDinamico.patchValue({
+            supplier_id           : response.supplier_id,
+          }, { emitEvent: false });
+
+          that.parsearTexto(response.texto);
+
+          const archivos: any[] = await that.obtenerBlobs(response);
+
+          for (const file of archivos) {
+
+            try {
+              // Esperamos a que la compresión termine antes de seguir con la siguiente
+              // const fileComprimido = await that.compressImage(file);
+              
+              // Guardamos el archivo binario para el envío a la API
+              // this.archivosSeleccionados.push(fileComprimido);
+              that.archivosSeleccionados = [...that.archivosSeleccionados, file];
+              
+              // Creamos la URL original (la que se puede revocar)
+              const rawUrl = URL.createObjectURL(file);
+
+              // Creamos un objeto que guarde ambas versiones
+              const previewData = {
+                raw: rawUrl,                                          // Para revocar después
+                safe: that.sanitizer.bypassSecurityTrustUrl(rawUrl)   // Para el [src] del HTML
+              };
+
+              that.previews = [...that.previews, previewData];
+
+            } catch (errorFile) {
+              console.error(`Error procesando el archivo ${file.name}:`, errorFile);
+              that.showToast('error', 'Error', `No se pudo procesar: ${file.name}`);
+            }            
+            
+          }
+
+          that.loading = false;
+          
+        } catch (err) {
+          that.tratarError(err);
+        } finally {
+          that.loading = false;
+        }
+      },
+      error(msg) {
+        that.loading = false;
+        that.tratarError(msg);
+      }
+    });
+  }
+
+  guardarEdit(): void {
+    if (this.archivosSeleccionados.length === 0) {
+      this.showToast('warning', 'Warning!', 'Selecciona al menos una imagen.');
+      return;
+    }
+
+    if (this.modoDinamico) {
+      if (this.formDinamico.invalid) {
+        this.showToast('warning', 'Warning!', 'Ingresa los campos requeridos.');
+        Object.values(this.formDinamico.controls).forEach(control => control.markAsTouched());
+        return;
+      }
+    } 
+
+    // Si userId es null o 0, entra en la validación
+    if (!this.userId) {
+      this.showToast('warning', 'Warning!', 'Usuario inválido, inicia sesión nuevamente.');
+      return;
+    }
+
+    if (!this.idPublicacionEdit) {
+      this.showToast('warning', 'Warning!', 'Publicación inválida.');
+      return;
+    }
+
+    if (!navigator.onLine) {
+      this.showToast('warning', 'Warning!', 'Necesitas conexión a internet.');
+      return;
+    }
+
+    this.editar();
+  }
+
+  async editar(): Promise<void> {
+    this.loading = true;
+
+    try {
+      let publicationID: number;
+      let supplierId: number;
+      let texto: string;
+
+      publicationID       = this.idPublicacionEdit;
+      supplierId          = Number(this.formDinamico.value.supplier_id);
+      texto               = this.generarTexto();
+
+      const resultado = await this.publicationService.editarConOnline(
+        publicationID,
+        supplierId,
+        texto,
+        this.archivosSeleccionados
+      );
+
+      console.log(resultado);
+
+      this.loading = false;
+
+      this.limpiarFormulario();
+
+      this.edicionFinalizadaEvent.emit(); // Avisa al padre que terminó
+
+    } catch (err) {
+      this.loading = false;
+      this.tratarError(err);
+    }
+  }
+  
+  cancelarEdicion() {
+    this.limpiarFormulario()
+    this.edicionFinalizadaEvent.emit(); // Limpia el estado en el padre
+  }
+
+  parsearTexto(texto: string): void {
+    // Normalizar saltos de línea
+    const t = texto.replace(/\r\n/g, '\n');
+
+    // Proveedor
+    const proveedorMatch = t.match(/Proveedor \*(.+?)\*/);
+    const proveedor = proveedorMatch ? proveedorMatch[1].trim() : '';
+
+    // Código
+    const codigoMatch = t.match(/\n\n\*(.+?)\*\n/);
+    const codigo = codigoMatch ? codigoMatch[1].trim() : '';
+
+    // Tallas
+    const tallasMatch = t.match(/🔖 \*Tallas disponibles\*\n([\s\S]+?)\n\n/);
+    const tallas = tallasMatch
+      ? tallasMatch[1].split('\n').map((t: string) => t.trim()).filter((t: string) => t.length > 0).join(', ')
+      : '';
+
+    // Colores
+    const coloresMatch = t.match(/🎨 \*Colores disponibles\*\n([\s\S]+?)\n\n/);
+    const colores = coloresMatch
+      ? coloresMatch[1].split('\n').map((c: string) => c.trim()).filter((c: string) => c.length > 0).join(', ')
+      : '';
+
+    // Precio
+    const precioMatch = t.match(/Precio \*\$(.+?) MX\.\*/);
+    const precio = precioMatch ? precioMatch[1].trim() : '';
+
+    this.formDinamico.patchValue({
+      supplier_razon_social: proveedor,
+      precio: precio,
+      tallas: tallas,
+      colores: colores,
+    }, { emitEvent: false });
+
+    if (codigo) {
+      this.codigoGenerado = codigo;
+    }
+  }
+
+  private async obtenerBlobs(pub: any): Promise<any[]> {
+    return Promise.all(
+      pub.images.map(async (img: any, i: number) => {
+        // Si la url es base64 (offline) o URL normal (online)
+        const res  = await fetch(img.url);
+        const blob = await res.blob();
+        return new File([blob], `imagen_${i}.jpg`, { type: blob.type });
+      })
+    );
+  }
+
+  //#endregion
 
 }

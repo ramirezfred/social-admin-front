@@ -65,6 +65,8 @@ export class ListaComponent implements OnInit {
   userId: any;
   userRole = 0;
 
+  @Output() editarPublicacionEvent = new EventEmitter<any>();
+
   constructor(
     private modalService: NgbModal,
     private toasterService: ToasterService,
@@ -138,7 +140,7 @@ export class ListaComponent implements OnInit {
     }
   }
 
-  // ---- Tabla ----
+  //#region Tabla
   init() {
     this.currentIndex = 1;
     this.pageStart = 1;
@@ -200,7 +202,7 @@ export class ListaComponent implements OnInit {
     this.refreshItems();
   }
 
-  // ---- Visualizar publicaciones de otros usuarios
+  //#endregion
 
   onEmpleadoChange(idEmpleado: string) {
 
@@ -468,4 +470,39 @@ export class ListaComponent implements OnInit {
       });
     });
   }
+
+  //#region Editar publicacion
+  editar(publicacion: any) {
+    // Emitimos el ID hacia el padre
+    this.editarPublicacionEvent.emit(publicacion.id);
+  }
+
+  getEditada(): void {
+
+    if(this.publicacionActual){
+
+      this.loading = true;
+      var that = this;
+
+      this.publicationService.showNormal(this.publicacionActual.id)
+      .subscribe({
+        next(res:any) {
+
+          console.log(res);
+
+          that.publicacionActual = res.data;
+
+          that.loading = false;
+          
+        },
+        error(msg) {
+          that.loading = false;
+          that.tratarError(msg);
+        }
+      });
+    }
+    
+  }
+  //#endregion
+
 }

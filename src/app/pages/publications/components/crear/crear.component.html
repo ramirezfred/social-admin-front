@@ -207,7 +207,7 @@
   <br>
 
   <!-- Botones -->
-  <div class="row">
+  <div *ngIf="!esModoEdicion" class="row">
     <div class="col-12" style="text-align: right;">
       <button type="button" class="btn btn-tn btn-secondary"
         (click)="limpiarFormulario()">
@@ -217,6 +217,20 @@
         style="margin-left: 8px;"
         (click)="guardar()">
         <i class="fa fa-save"></i> Guardar publicación
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="esModoEdicion" class="row">
+    <div class="col-12" style="text-align: right;">
+      <button type="button" class="btn btn-tn btn-secondary"
+        (click)="cancelarEdicion()">
+        Cancelar edición
+      </button>
+      <button type="button" class="btn btn-tn btn-primary"
+        style="margin-left: 8px;"
+        (click)="guardarEdit()">
+        <i class="fa fa-save"></i> Editar publicación
       </button>
     </div>
   </div>

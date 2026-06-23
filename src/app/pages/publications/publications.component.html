@@ -33,12 +33,18 @@
           <div [ngClass]="{'tab-pane fade show active': selectedTab1, 'tab-pane fade': !selectedTab1}"
             id="nav-1" role="tabpanel" aria-labelledby="nav-tab1">
             <br>
-            <app-crear></app-crear>
+            <app-crear
+              [idPublicacionEdit]="idPublicacionParaEditar"
+              (edicionFinalizadaEvent)="onEdicionFinalizada()"
+            ></app-crear>
           </div>
           <div [ngClass]="{'tab-pane fade show active': selectedTab2, 'tab-pane fade': !selectedTab2}"
             id="nav-2" role="tabpanel" aria-labelledby="nav-tab2">
             <br>
-            <app-lista (cont_publications_event)="count_publications = $event"></app-lista>
+            <app-lista 
+              (cont_publications_event)="count_publications = $event"
+              (editarPublicacionEvent)="onSolicitarEditar($event)"
+            ></app-lista>
           </div>
           <div [ngClass]="{'tab-pane fade show active': selectedTab3, 'tab-pane fade': !selectedTab3}"
             id="nav-3" role="tabpanel" aria-labelledby="nav-tab3">

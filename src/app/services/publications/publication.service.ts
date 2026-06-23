@@ -69,12 +69,20 @@ export class PublicationService implements OnDestroy {
     return this.http.get<Publication>(`${this.apiUrl}/${id}`);
   }
 
+  showNormal(id: any): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}/publicacion/normal`);
+  }
+
   publish(id: number): Observable<Publication> {
     return this.http.put<Publication>(`${this.apiUrl}/${id}/publish`, {});
   }
 
   destroy(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  editar(id: number, formData: FormData): Observable<Publication> {
+    return this.http.post<any>(`${this.apiUrl}/${id}/editar`, formData);
   }
 
   // ---- Crear con soporte offline ----
@@ -119,6 +127,39 @@ export class PublicationService implements OnDestroy {
       }
     }
     return 'local';
+
+  }
+
+  async editarConOnline(
+    publicationId: number,
+    supplierId: number,
+    texto: string,
+    archivos: any[]
+  ): Promise<any> {
+
+    try {
+
+      const fd = new FormData();
+      fd.append('supplier_id', String(supplierId));
+      fd.append('texto', texto);
+      
+      // Añadir imágenes
+      // Recorremos el arreglo y los agregamos al FormData
+      archivos.forEach((imagen) => {
+        fd.append('images[]', imagen);
+      });
+
+      let res = null;
+      
+      // Enviar a la API
+      res = await this.editar(publicationId, fd).toPromise();
+
+      return res;
+    } catch (error) {
+
+      // Re-lanzamos el error para que el componente lo capture y muestre el mensaje
+      throw error;
+    }
 
   }
 

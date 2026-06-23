@@ -59,6 +59,13 @@
     <br>
     <div class="row">
       <div class="col-12" style="text-align: right;">
+        <button
+          type="button" class="btn btn-tn btn-info"
+          title="Editar"
+          (click)="editar(publicacionActual)"
+          style="margin-top: 10px;">
+          <i class="fa fa-edit"></i>
+        </button>
         <button type="button" class="btn btn-tn btn-danger"
           title="Eliminar"
           (click)="abrirModalEliminar(publicacionActual, modalEliminar)"
