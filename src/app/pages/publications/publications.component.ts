@@ -18,6 +18,7 @@ export class PublicationsComponent implements OnInit {
   selectedTab1 = true;   // Lista
   selectedTab2 = false;  // Crear
   selectedTab3 = false;  // Catalogo
+  selectedTab4 = false;  // Wa Sender
 
   config: ToasterConfig = new ToasterConfig({
     positionClass: 'toast-top-right',
@@ -55,6 +56,7 @@ export class PublicationsComponent implements OnInit {
     if(tab === 3){
       this.CatalogoC.initComponent();
     }
+    this.selectedTab4 = tab === 4;
   }
 
   //#region Editar publicaciones

@@ -1,0 +1,155 @@
+@import '../../@theme/styles/themes';
+@import '~@nebular/theme/styles/global/bootstrap/hero-buttons';
+@import '~bootstrap/scss/mixins/breakpoints';
+@import '~@nebular/theme/components/card/card.component.theme';
+@import '~@nebular/theme/styles/global/bootstrap/breakpoints';
+@import '~@nebular/theme/styles/core/mixins';
+
+@include nb-install-component() {
+
+  @include media-breakpoint-down(xs) {
+    button:not(.btn-icon) {
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+    }
+  } 
+
+  /* bulk-message.component.css */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.status-section {
+  background: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.status-badge {
+  padding: 10px;
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+.status-badge.CONNECTED {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.DISCONNECTED {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-badge.WAITING_QR {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.qr-container {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.qr-container img {
+  max-width: 300px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+}
+
+.control-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.control-buttons button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.send-section {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.contact-item {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.contact-item input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  flex: 1;
+}
+
+.contact-item button {
+  padding: 8px 12px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-actions {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.add-actions button {
+  background: #28a745;
+  color: white;
+  cursor: pointer;
+}
+
+.message-section textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: Arial, sans-serif;
+}
+
+.files-section {
+  margin: 20px 0;
+}
+
+.submit-section {
+  margin-top: 20px;
+}
+
+.submit-section button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 20px;
+  background: #f0f0f0;
+  border-radius: 10px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  background: #28a745;
+  transition: width 0.5s;
+}
+
+
+
+}

@@ -1,0 +1,103 @@
+<div class="row">
+  <div class="col-12">
+  
+    <nb-card>
+      <nb-card-header>Mensajes Masivos</nb-card-header>
+      <nb-card-body>
+        
+        <!-- bulk-message.component.html -->
+        <div class="container">
+
+          <!-- Estado de conexión -->
+          <div class="status-section">
+            <h3>Estado de Conexión</h3>
+            <div class="status-badge" [ngClass]="status">
+              Estado: {{ status }}
+            </div>
+            
+            <!-- Mostrar QR si está esperando escaneo -->
+            <div *ngIf="status === 'WAITING_QR'" class="qr-container">
+              <h4>Escanea el código QR con WhatsApp:</h4>
+              <img [src]="'data:image/png;base64,' + qrCode" alt="QR Code" />
+              <p>O escanea el QR que aparece en la consola del servidor</p>
+            </div>
+
+            <!-- Botones de control -->
+            <div class="control-buttons">
+              <button class="btn btn-tn btn-info" (click)="login()" [disabled]="isLoading || status === 'CONNECTED'">
+                Iniciar Sesión
+              </button>
+              <button class="btn btn-tn btn-info" (click)="reset()" [disabled]="isLoading">
+                Reiniciar Sesión
+              </button>
+              <button class="btn btn-tn btn-info" (click)="stop()" [disabled]="isLoading">
+                Detener Sesión
+              </button>
+            </div>
+          </div>
+
+          <!-- Formulario de envío -->
+          <div class="send-section" *ngIf="status === 'CONNECTED'">
+            <h3>Enviar Mensajes Masivos</h3>
+            
+            <form [formGroup]="messageForm" (ngSubmit)="sendBulkMessages()">
+              <!-- Lista de contactos -->
+              <div class="contacts-section">
+                <h4>Contactos</h4>
+                <div formArrayName="contacts">
+                  <div *ngFor="let contact of contacts.controls; let i = index" 
+                      [formGroupName]="i" class="contact-item">
+                    <input formControlName="user" placeholder="Nombre" />
+                    <input formControlName="numero" placeholder="Número (ej: 584141234567)" />
+                    <button type="button" (click)="removeContact(i)">✕</button>
+                  </div>
+                </div>
+                
+                <div class="add-actions">
+                  <button type="button" class="btn btn-tn" (click)="addContact()">+ Agregar Contacto</button>
+                  <div class="file-upload">
+                    <label for="csvFile">Cargar CSV:</label>
+                    <input type="file" id="csvFile" accept=".csv" 
+                          (change)="loadContactsFromCSV($event)" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mensaje -->
+              <div class="message-section">
+                <h4>Mensaje</h4>
+                <textarea formControlName="message" rows="5" 
+                          placeholder="Escribe tu mensaje... Usa USERNAME; para personalizar"></textarea>
+                <small>Usa USERNAME para reemplazar con el nombre del contacto</small>
+              </div>
+
+              <!-- Archivos adjuntos -->
+              <div class="files-section">
+                <h4>Archivos Adjuntos</h4>
+                <input type="file" multiple (change)="onFileSelected($event)" />
+                <small>Puedes seleccionar múltiples archivos (imágenes, documentos)</small>
+              </div>
+
+              <!-- Enviar -->
+              <div class="submit-section">
+                <button type="submit" class="btn btn-tn btn-info" [disabled]="isSending || messageForm.invalid">
+                  {{ isSending ? 'Enviando...' : 'Enviar Mensajes' }}
+                </button>
+                <div *ngIf="isSending" class="progress-bar">
+                  <div class="progress" [style.width.%]="sendProgress"></div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </nb-card-body>
+    </nb-card>
+
+  </div>
+</div>
+
+<div class="my-container">
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '4px' }"></ngx-loading>
+</div>
+

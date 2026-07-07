@@ -1,0 +1,64 @@
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      
+      <div class="card shadow-sm whatsapp-card">
+        <div class="card-body p-4">
+          
+          <div class="text-center mb-4">
+            <i class="bi bi-whatsapp text-success display-4"></i>
+            <h3 class="mt-2 fw-bold text-dark">Enviar Mensaje</h3>
+            <p class="text-muted small">Ingresa los datos para enviar a través de la API</p>
+          </div>
+
+          <form (ngSubmit)="enviarMensaje()" #whatsappForm="ngForm" novalidate>
+            
+            <div class="mb-3">
+              <label for="numeroDestino" class="form-label fw-semibold">Número de Destino</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="numeroDestino" 
+                  name="numeroDestino"
+                  [(ngModel)]="numeroDestino"
+                  placeholder="Ej: 54911XXXXXXXX" 
+                  required>
+              </div>
+              <div class="form-text">Incluye el código de país sin el signo "+".</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="mensaje" class="form-label fw-semibold">Mensaje</label>
+              <textarea 
+                class="form-control" 
+                id="mensaje" 
+                name="mensaje"
+                [(ngModel)]="mensaje"
+                rows="4" 
+                placeholder="Escribe tu mensaje aquí..." 
+                required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100 py-2 fw-bold" [disabled]="isSubmitting">
+              <span>{{ btnText }}</span>
+              <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>
+            </button>
+          </form>
+
+            <div *ngIf="showAlert" class="alert mt-4 d-flex align-items-center" 
+                    [ngClass]="{'alert-success': alertType === 'success', 'alert-danger': alertType === 'danger'}">
+                
+                <i class="bi me-2" 
+                    [ngClass]="{'bi-check-circle-fill': alertType === 'success', 'bi-exclamation-triangle-fill': alertType === 'danger'}"></i>
+                
+                <div>{{ alertMessage }}</div>
+            </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

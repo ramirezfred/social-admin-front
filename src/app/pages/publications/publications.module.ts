@@ -9,6 +9,8 @@ import { ListaComponent } from './components/lista/lista.component';
 import { CrearComponent } from './components/crear/crear.component';
 import { CatalogoComponent } from './components/catalogo/catalogo.component';
 
+import { WaSenderComponent } from './components/wa-sender/wa-sender.component';
+
 // import { PublicationService } from '../../services/publications/publication.service';
 // import { SupplierService } from '../../services/publications/supplier.service';
 // import { OfflineQueueService } from '../../services/publications/offline-queue.service';
@@ -33,6 +35,7 @@ import { CatalogoComponent } from './components/catalogo/catalogo.component';
     ListaComponent,
     CrearComponent,
     CatalogoComponent,
+    WaSenderComponent
   ],
   providers: [
     // PublicationService,

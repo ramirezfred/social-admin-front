@@ -25,6 +25,10 @@ const routes: Routes = [{
     path: 'publications',                                                      
     loadChildren: './publications/publications.module#PublicationsModule',
   },
+  {
+    path: 'bulk-message',                                                      
+    loadChildren: './bulk-message/bulk-message.module#BulkMessageModule',
+  },
 
 
   {

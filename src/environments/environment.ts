@@ -10,6 +10,6 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost/publicacionesIA/publicacionesIAAPI/public',
-  // apiUrl: 'https://apisocial.internow.com.mx',
+  // apiUrl: 'http://localhost/publicacionesIA/publicacionesIAAPI/public',
+  apiUrl: 'https://apisocial.internow.com.mx',
 };

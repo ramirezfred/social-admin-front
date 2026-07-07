@@ -26,6 +26,12 @@ export const MENU_ADMIN: NbMenuItem[] = [
     icon: 'ion-chatbubbles',
     link: '/pages/social',
     home: true,
+  },
+  {
+    title: 'Difusión',
+    icon: 'fa fa-whatsapp',
+    link: '/pages/bulk-message',
+    home: true,
   }
   
 
